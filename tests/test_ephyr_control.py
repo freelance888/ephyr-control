@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from zmq import Socket
 
-from ephyr_control import __version__
+from ephyr_control import __version__, EphyrStreamControl
 from ephyr_control.config import LangStreamConfig, StreamConfig, ZMQConfig
 from ephyr_control.control import StreamCommunicator, LangStreamControl
 
@@ -37,6 +37,11 @@ def lang_stream_control(lang_stream_config):
     return lsc
 
 
+@pytest.fixture
+def ephyr_stream_control(lang_stream_control):
+    return EphyrStreamControl({"ru": lang_stream_control, "en": lang_stream_control})
+
+
 def test_volume_mute_and_unmute(lang_stream_control):
     lang_stream_control.trn.curr_volume = 1.0
     lang_stream_control.org.curr_volume = 0.3
@@ -48,3 +53,7 @@ def test_volume_mute_and_unmute(lang_stream_control):
     lang_stream_control.unmute_all()
     assert lang_stream_control.trn.curr_volume == 1.0
     assert lang_stream_control.org.curr_volume == 0.3
+
+
+def test_ephyr_stream_control_iteration(ephyr_stream_control):
+    assert ["ru", "en"] == list(ephyr_stream_control)
