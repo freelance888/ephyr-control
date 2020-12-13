@@ -3,6 +3,7 @@ from typing import Dict, Optional
 
 import zmq
 
+from .utils import is_open
 from .config import (
     LangStreamConfig,
     SpecificStream,
@@ -10,8 +11,6 @@ from .config import (
 )
 
 __all__ = ["EphyrStreamControl"]
-
-from .utils import is_open
 
 
 class StreamCommunicator:
@@ -160,6 +159,9 @@ class EphyrStreamControl:
 
     def __repr__(self):
         return f"EventStreamControl - <{self.lang_streams}>"
+
+    def __iter__(self):
+        yield from self.lang_streams.items()
 
     def __getitem__(self, item):
         return self.lang_streams[item]
