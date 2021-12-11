@@ -4,15 +4,18 @@ import uuid
 from ephyr_control.state.restream.input.pull_source import PullSource
 from ._mixins import _Input
 
-__all__ = ('FailoverInput', 'UuidFailoverInput',)
+__all__ = (
+    "FailoverInput",
+    "UuidFailoverInput",
+)
 
 
 @dataclasses.dataclass
 class FailoverInput(_Input):
     src: PullSource = None
 
-    KEY_MAIN = 'main'
-    KEY_BACKUP = 'backup'
+    KEY_MAIN = "main"
+    KEY_BACKUP = "backup"
 
 
 def main_input_factory(key_random_chars: int = 0) -> FailoverInput:

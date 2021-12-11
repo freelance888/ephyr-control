@@ -5,7 +5,7 @@ from .settings import Settings
 from .restream import Restream
 from ..utils.serialization import dtcls_to_json, pretty_dtcls_to_json
 
-__all__ = ('State', )
+__all__ = ("State",)
 
 
 @dataclasses.dataclass
@@ -17,7 +17,7 @@ class State:
     def __post_init__(self):
         # ensure unique restream keys
         if len({r.key for r in self.restreams}) < len(self.restreams):
-            raise ValueError('Not all restream keys are unique.')
+            raise ValueError("Not all restream keys are unique.")
 
     def get_restream_by_key(self, restream_key: str) -> Restream:
         try:

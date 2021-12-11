@@ -1,6 +1,6 @@
 import dataclasses
 
-__all__ = ('Settings', )
+__all__ = ("Settings",)
 
 
 @dataclasses.dataclass
@@ -11,7 +11,7 @@ class Settings:
 
     def to_dict(self) -> dict:
         return {
-            'title': self.title,
-            'delete_confirmation': self.delete_confirmation,
-            'enable_confirmation': self.enable_confirmation,
+            "title": self.title,
+            "delete_confirmation": self.delete_confirmation,
+            "enable_confirmation": self.enable_confirmation,
         }

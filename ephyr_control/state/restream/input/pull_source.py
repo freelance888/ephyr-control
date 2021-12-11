@@ -1,6 +1,6 @@
 import dataclasses
 
-__all__ = ('PullSource', )
+__all__ = ("PullSource",)
 
 
 @dataclasses.dataclass

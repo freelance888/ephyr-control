@@ -5,14 +5,14 @@ import requests
 
 import yarl
 
-__all__ = ('Pinger', )
+__all__ = ("Pinger",)
 
 
 @dataclasses.dataclass
 class Pinger:
     host: str
     port: int = None
-    protocol: str = 'http'
+    protocol: str = "http"
     username: str = None
     password: str = None
 
@@ -20,7 +20,7 @@ class Pinger:
     query: dict = None
     fragment: str = None
 
-    user_agent: str = 'Pinger (Python requests)'
+    user_agent: str = "Pinger (Python requests)"
 
     timeout: float = 10
     max_retries: int = 3
@@ -35,7 +35,7 @@ class Pinger:
 
     def __post_init__(self):
         self.target_url = self.build_url()
-        self.logger = logging.getLogger(f'Pinger {self.target}')
+        self.logger = logging.getLogger(f"Pinger {self.target}")
 
     def build_url(self) -> yarl.URL:
         return yarl.URL.build(
@@ -44,15 +44,15 @@ class Pinger:
             password=self.password,
             host=self.host,
             port=self.port,
-            path=self.path or '',
+            path=self.path or "",
             query=self.query,
-            fragment=self.fragment or '',
+            fragment=self.fragment or "",
         )
 
     def build_headers(self) -> dict:
         headers = {}
         if self.user_agent is not None:
-            headers['User-Agent'] = self.user_agent
+            headers["User-Agent"] = self.user_agent
         return headers
 
     @property
@@ -64,7 +64,7 @@ class Pinger:
         return requests.get(url, timeout=1, headers=headers)
 
     def _report_error(self, exc: Exception):
-        self.logger.error(f'Failed to ping {self.target} due to error: {exc}')
+        self.logger.error(f"Failed to ping {self.target} due to error: {exc}")
 
     def _ping(self) -> bool:
         resp = None
@@ -79,7 +79,7 @@ class Pinger:
             return False
         finally:
             if resp:
-                self.logger.debug(f'Response: [{len(resp.content)}] {resp.content}')
+                self.logger.debug(f"Response: [{len(resp.content)}] {resp.content}")
 
         if not self.do_raise_for_status:
             return resp.ok
@@ -96,12 +96,12 @@ class Pinger:
             return True
 
     def ping(self) -> bool:
-        self.logger.debug(f'Pinging {self.target} ...')
+        self.logger.debug(f"Pinging {self.target} ...")
         success = self._ping()
         if success:
-            self.logger.info(f'Successful ping from {self.target}')
+            self.logger.info(f"Successful ping from {self.target}")
         else:
-            self.logger.warning(f'Failed to ping {self.target}')
+            self.logger.warning(f"Failed to ping {self.target}")
         return success
 
     @staticmethod
@@ -110,7 +110,7 @@ class Pinger:
 
     def retrying_ping(self) -> bool:
         try:
-            self.logger.info(f'Immediate first attempt to ping {self.target} :')
+            self.logger.info(f"Immediate first attempt to ping {self.target} :")
             success = self.ping()
         except:
             pass
@@ -119,20 +119,24 @@ class Pinger:
                 return True
 
         for i in range(2, self.max_retries + 1):
-            self.logger.debug(f'Waiting for {self.timeout} second ...')
+            self.logger.debug(f"Waiting for {self.timeout} second ...")
             self._wait(self.timeout)
-            self.logger.info(f'{i}th attempt to ping {self.target} :')
+            self.logger.info(f"{i}th attempt to ping {self.target} :")
             if self.ping():
                 return True
         else:
-            self.logger.warning(f'All {self.max_retries} attempts to ping {self.target} failed')
+            self.logger.warning(
+                f"All {self.max_retries} attempts to ping {self.target} failed"
+            )
             return False
 
     def interactive_ping(self) -> bool:
         gave_up = False
         while not gave_up:
             if not self.retrying_ping():
-                gave_up = input(f'Do you want continue ping attempts? (y/N) ').lower() not in {'y', 'yes'}
+                gave_up = input(
+                    f"Do you want continue ping attempts? (y/N) "
+                ).lower() not in {"y", "yes"}
             else:
                 return True
         else:

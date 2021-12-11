@@ -4,14 +4,14 @@ import gql
 
 from .instance import EphyrInstance
 
-__all__ = ('RemoteEphyrInstance',)
+__all__ = ("RemoteEphyrInstance",)
 
 
 @dataclasses.dataclass
 class RemoteEphyrInstance(EphyrInstance):
     _client: gql.Client = None
 
-    EPHYR_GRAPHQL_URL_TEMPLATE = '{scheme}://:{password}@{host}/api'
+    EPHYR_GRAPHQL_URL_TEMPLATE = "{scheme}://:{password}@{host}/api"
 
     Transport = gql.transport.requests.RequestsHTTPTransport
 
@@ -25,7 +25,7 @@ class RemoteEphyrInstance(EphyrInstance):
         return self.EPHYR_GRAPHQL_URL_TEMPLATE.format(
             scheme=self.scheme,
             host=self.host,
-            password=self.password or '',
+            password=self.password or "",
         )
 
     def _build_client(self) -> gql.Client:
@@ -40,10 +40,15 @@ class RemoteEphyrInstance(EphyrInstance):
             variable_values=variable_values,
         )
 
-    def ping(self, do_raise: bool = False, check_domain: bool = True, loglevel: str = logging.ERROR) -> bool:
+    def ping(
+        self,
+        do_raise: bool = False,
+        check_domain: bool = True,
+        loglevel: str = logging.ERROR,
+    ) -> bool:
         if check_domain:
             if not self.domain:
-                raise ValueError('Can not check domain if it is not set')
+                raise ValueError("Can not check domain if it is not set")
             host = self.domain
         else:
             host = self.host
@@ -63,7 +68,7 @@ class RemoteEphyrInstance(EphyrInstance):
             setPassword(new: $new, old: $old, kind: $kind)
         }
     """
-        )
+    )
 
     def _change_password(self, new_password: str or None) -> bool:
         return self.execute(
@@ -71,20 +76,20 @@ class RemoteEphyrInstance(EphyrInstance):
             variable_values=dict(
                 new=new_password,
                 old=self.password,
-                kind='MAIN',
-            )
+                kind="MAIN",
+            ),
         )
 
     def change_password(self, new_password: str or None) -> bool:
         result = self._change_password(new_password=new_password)
-        success = result['setPassword']
+        success = result["setPassword"]
         if success:
             self.password = new_password
             self._client = self._build_client()
         return success
 
     gql_change_settings = gql.gql(
-        '''
+        """
         mutation SetSettings(
             $title: String
             $delete_confirmation: Boolean!
@@ -96,8 +101,8 @@ class RemoteEphyrInstance(EphyrInstance):
                 enableConfirmation: $enable_confirmation
             )
         }
-    '''
-        )
+    """
+    )
 
     def _change_settings(self, settings: Settings) -> dict:
         variables = settings.to_dict()
@@ -108,16 +113,16 @@ class RemoteEphyrInstance(EphyrInstance):
 
     def change_settings(self, settings: Settings) -> bool:
         result = self._change_settings(settings=settings)
-        success = result['setSettings']
+        success = result["setSettings"]
         return success
 
     gql_change_state = gql.gql(
-        '''
+        """
         mutation Import($restream_id: RestreamId, $replace: Boolean!, $spec: String!) {
             import(restreamId: $restream_id, replace: $replace, spec: $spec)
         }
-    '''
-        )
+    """
+    )
 
     def _change_state(self, state: State, replace: bool = False) -> dict:
         variables = dict(
@@ -132,11 +137,11 @@ class RemoteEphyrInstance(EphyrInstance):
 
     def change_state(self, state: State, replace: bool = False) -> bool:
         result = self._change_state(state=state, replace=replace)
-        success = result['import']
+        success = result["import"]
         return success
 
     gql_get_info = gql.gql(
-        '''
+        """
         query Info {
             info {
                 publicHost
@@ -147,25 +152,25 @@ class RemoteEphyrInstance(EphyrInstance):
                 enableConfirmation
             }
         }
-    '''
-        )
+    """
+    )
 
     def get_info(self) -> dict:
         data = self.execute(self.gql_get_info)
-        return data['info']
+        return data["info"]
 
     gql_export_all_restreams = gql.gql(
-        '''
+        """
         query ExportAllRestreams {
             export
         }
-    '''
-        )
+    """
+    )
 
     def _export_all_restreams(self) -> dict:
         data = self.execute(self.gql_export_all_restreams)
-        return data['export']
+        return data["export"]
 
     def verify_ipv4_domain_match(self) -> bool:
-        public_host = self.get_info()['publicHost']
+        public_host = self.get_info()["publicHost"]
         return public_host == self.ipv4

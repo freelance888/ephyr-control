@@ -19,19 +19,21 @@ class _KeyedMixin:
     KEY_MAXLENGTH: ClassVar[int] = min(INPUT_KEY_MAXLENGTH, RESTREAM_KEY_MAXLENGTH)
 
     # Constants of this implementation
-    KEY_SEP: ClassVar[str] = '_'
+    KEY_SEP: ClassVar[str] = "_"
     KEY_RANDOM_LENGTH_DEFAULT: ClassVar[int] = 8
 
     def __post_init__(self):
         if len(self.key) > self.KEY_MAXLENGTH:
-            raise ValueError(f'key is too long. Maximum is {self.KEY_MAXLENGTH}, got {len(self.key)}: {self.key}')
+            raise ValueError(
+                f"key is too long. Maximum is {self.KEY_MAXLENGTH}, got {len(self.key)}: {self.key}"
+            )
 
     @classmethod
     def build_key_with_random(cls, prefix: str, length: int = None) -> str:
         if length == 0:
             return prefix
         elif length < 0:
-            raise ValueError(f'length must be positive')
+            raise ValueError(f"length must be positive")
         random_suffix = generate_random_key_of_length(
             length=length if length is not None else cls.KEY_RANDOM_LENGTH_DEFAULT,
         )

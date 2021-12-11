@@ -8,12 +8,14 @@ from .input import Input, FailoverInput
 from .output import Output
 from ..constant import RESTREAM_KEY_MAXLENGTH
 
-__all__ = ('Restream', )
+__all__ = ("Restream",)
 
 
 @dataclasses.dataclass
 class Restream(_KeyedMixin):
-    key: str = dataclasses.field(default_factory=lambda: generate_random_key_of_length(length=4))
+    key: str = dataclasses.field(
+        default_factory=lambda: generate_random_key_of_length(length=4)
+    )
     label: str = None
     outputs: List[Output] = dataclasses.field(default_factory=list)
     input: Input = dataclasses.field(default_factory=Input)
@@ -76,9 +78,10 @@ class UuidRestream(Restream):
 
 @dataclasses.dataclass
 class HostAwareRestream(Restream):
-    """ This class remembers it's host for easier URI generation,
+    """This class remembers it's host for easier URI generation,
     but don't turn it in JSON and paste to Ephyr - convert it back
-    to normal Restream first with .make_unaware method. """
+    to normal Restream first with .make_unaware method."""
+
     host: str = None  # well, actually, its required.
 
     def pull_from_uri(self) -> str:

@@ -3,7 +3,7 @@ import uuid
 
 from .volume import Volume
 
-__all__ = ('Output', 'UuidOutput')
+__all__ = ("Output", "UuidOutput")
 
 
 @dataclasses.dataclass

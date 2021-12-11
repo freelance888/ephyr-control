@@ -1,6 +1,6 @@
 import dataclasses
 
-__all__ = ('EphyrInstance',)
+__all__ = ("EphyrInstance",)
 
 
 @dataclasses.dataclass
@@ -26,10 +26,11 @@ class EphyrInstance:
 
     @property
     def scheme(self) -> str:
-        return 'https' if self.https else 'http'
+        return "https" if self.https else "http"
 
     def print(self):
-        address = f'{self.scheme}://{self.domain if self.domain else self.ipv4}/'
-        print(f'Ephyr instance "{self.title}" at {address}{" (" + str(self.ipv4) + ")" if self.domain else ""}')
-        print(f'Ephyr suggested password: {self.password}')
-
+        address = f"{self.scheme}://{self.domain if self.domain else self.ipv4}/"
+        print(
+            f'Ephyr instance "{self.title}" at {address}{" (" + str(self.ipv4) + ")" if self.domain else ""}'
+        )
+        print(f"Ephyr suggested password: {self.password}")

@@ -5,7 +5,7 @@ from typing import List
 from .volume import Volume
 from .output import Output, UuidOutput
 
-__all__ = ('Mixin', 'OutputWithMixins', 'UuidOutputWithMixins')
+__all__ = ("Mixin", "OutputWithMixins", "UuidOutputWithMixins")
 
 
 @dataclasses.dataclass
@@ -17,12 +17,12 @@ class Mixin:
 
     src: str
     volume: Volume = None
-    delay: str = '3s 500ms'
+    delay: str = "3s 500ms"
 
     @classmethod
     def from_dict(cls, d: dict) -> "Mixin":
-        if 'volume' in d:
-            volume = Volume(**d.pop('volume'))
+        if "volume" in d:
+            volume = Volume(**d.pop("volume"))
         else:
             volume = None
         return cls(**d, volume=volume)

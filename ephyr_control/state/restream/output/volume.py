@@ -1,6 +1,6 @@
 import dataclasses
 
-__all__ = ('Volume',)
+__all__ = ("Volume",)
 
 
 @dataclasses.dataclass
