@@ -6,9 +6,8 @@ authors = ["Serhii Khalymon <sergiykhalimon@gmail.com>", "Illia Ananich <illia.a
 
 [tool.poetry.dependencies]
 python = "^3.8"
-voila = "^0.1.21"
-ipywidgets = "^7.5.1"
-pydantic = "^1.6.1"
+yarl = "^1.6"
+gql = {version = "^2.0", extras = ["requests"]}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
