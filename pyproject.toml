@@ -8,10 +8,34 @@ authors = ["Serhii Khalymon <sergiykhalimon@gmail.com>", "Illia Ananich <illia.a
 python = "^3.8"
 yarl = "^1.6"
 gql = {version = "^2.0", extras = ["requests"]}
+pre-commit = "^2.16.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+black = "^21.12b0"
+flake8 = "^4.0.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 80
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+)/
+'''
