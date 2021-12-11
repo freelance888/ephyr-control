@@ -11,8 +11,8 @@ Client library that allow to control [Ephyr] streaming.
 ### Example of usage
 First of all you need to deploy [Ephyr] to the server. Setup config and push RTMP stream to [Ephyr] endpoint. At this poing you're able to control actual process of mixing.
  
-Example of config [mix.client.example.json](examples/mix.client.example.json) 
-anb usage [example.py](examples/example.py)
+# TODO:
+* new usage example
 
 
 ## License
