@@ -29,8 +29,11 @@ class EphyrInstance:
         return "https" if self.https else "http"
 
     def print(self):
-        address = f"{self.scheme}://{self.domain if self.domain else self.ipv4}/"
+        address = (
+            f"{self.scheme}://{self.domain if self.domain else self.ipv4}/"
+        )
         print(
-            f'Ephyr instance "{self.title}" at {address}{" (" + str(self.ipv4) + ")" if self.domain else ""}'
+            f'Ephyr instance "{self.title}" at {address}'
+            f'{" (" + str(self.ipv4) + ")" if self.domain else ""}'
         )
         print(f"Ephyr suggested password: {self.password}")

@@ -1,9 +1,9 @@
 import dataclasses
 from typing import List, ClassVar
 
+from .endpoint import Endpoint, rtmp_endpoint_factory
 from .._mixins import _KeyedMixin
 from ...constant import INPUT_KEY_MAXLENGTH
-from .endpoint import Endpoint, rtmp_endpoint_factory
 
 __all__ = ("_Input",)
 

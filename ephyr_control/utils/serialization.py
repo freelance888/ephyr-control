@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from functools import partial
 
 import gql
 import yarl
@@ -22,8 +23,9 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-dtcls_to_json = lambda dtcls: json.dumps(dtcls, cls=EnhancedJSONEncoder)
+dtcls_to_json = partial(json.dumps, cls=EnhancedJSONEncoder)
+
 # pretty JSON https://docs.python.org/3/library/json.html
-pretty_dtcls_to_json = lambda dtcls: json.dumps(
-    dtcls, cls=EnhancedJSONEncoder, sort_keys=True, indent=2
+pretty_dtcls_to_json = partial(
+    json.dumps, cls=EnhancedJSONEncoder, sort_keys=True, indent=2
 )

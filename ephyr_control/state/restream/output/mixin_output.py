@@ -2,8 +2,8 @@ import dataclasses
 import uuid
 from typing import List
 
-from .volume import Volume
 from .output import Output, UuidOutput
+from .volume import Volume
 
 __all__ = ("Mixin", "OutputWithMixins", "UuidOutputWithMixins")
 
@@ -11,8 +11,10 @@ __all__ = ("Mixin", "OutputWithMixins", "UuidOutputWithMixins")
 @dataclasses.dataclass
 class Mixin:
     """
-    Note: this class is no a "mixin" by the standard meaning of this word in Python OOP.
-    It only referes to an entity in Ephyr state structure that mixes video and audio.
+    Note: this class is no a "mixin" by the standard meaning of this word
+    in Python OOP.
+    It only referes to an entity in Ephyr state structure that mixes
+    video and audio.
     """
 
     src: str

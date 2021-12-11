@@ -1,8 +1,8 @@
 import dataclasses
 
 from .constant import EPHYR_CONFIG_VERSION
-from .settings import Settings
 from .restream import Restream
+from .settings import Settings
 from ..utils.serialization import dtcls_to_json, pretty_dtcls_to_json
 
 __all__ = ("State",)

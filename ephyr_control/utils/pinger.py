@@ -1,8 +1,8 @@
 import dataclasses
 import logging
 import time
-import requests
 
+import requests
 import yarl
 
 __all__ = ("Pinger",)
@@ -79,7 +79,9 @@ class Pinger:
             return False
         finally:
             if resp:
-                self.logger.debug(f"Response: [{len(resp.content)}] {resp.content}")
+                self.logger.debug(
+                    f"Response: [{len(resp.content)}] {resp.content}"
+                )
 
         if not self.do_raise_for_status:
             return resp.ok
@@ -112,7 +114,7 @@ class Pinger:
         try:
             self.logger.info(f"Immediate first attempt to ping {self.target} :")
             success = self.ping()
-        except:
+        except IOError:
             pass
         else:
             if success:
@@ -135,7 +137,7 @@ class Pinger:
         while not gave_up:
             if not self.retrying_ping():
                 gave_up = input(
-                    f"Do you want continue ping attempts? (y/N) "
+                    "Do you want continue ping attempts? (y/N) "
                 ).lower() not in {"y", "yes"}
             else:
                 return True

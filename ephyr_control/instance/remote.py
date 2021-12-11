@@ -1,8 +1,13 @@
 import dataclasses
 import logging
+from typing import ClassVar, Type
+
 import gql
+import gql.transport.requests
 
 from .instance import EphyrInstance
+from .. import State, Settings
+from ..utils import Pinger
 
 __all__ = ("RemoteEphyrInstance",)
 
@@ -11,9 +16,11 @@ __all__ = ("RemoteEphyrInstance",)
 class RemoteEphyrInstance(EphyrInstance):
     _client: gql.Client = None
 
-    EPHYR_GRAPHQL_URL_TEMPLATE = "{scheme}://:{password}@{host}/api"
+    EPHYR_GRAPHQL_URL_TEMPLATE: ClassVar[
+        str
+    ] = "{scheme}://:{password}@{host}/api"
 
-    Transport = gql.transport.requests.RequestsHTTPTransport
+    Transport: ClassVar[Type] = gql.transport.requests.RequestsHTTPTransport
 
     @property
     def client(self) -> gql.Client:
@@ -70,7 +77,7 @@ class RemoteEphyrInstance(EphyrInstance):
     """
     )
 
-    def _change_password(self, new_password: str or None) -> bool:
+    def _change_password(self, new_password: str or None) -> dict:
         return self.execute(
             self.gql_change_password,
             variable_values=dict(
@@ -118,8 +125,16 @@ class RemoteEphyrInstance(EphyrInstance):
 
     gql_change_state = gql.gql(
         """
-        mutation Import($restream_id: RestreamId, $replace: Boolean!, $spec: String!) {
-            import(restreamId: $restream_id, replace: $replace, spec: $spec)
+        mutation Import(
+            $restream_id: RestreamId
+            $replace: Boolean!
+            $spec: String!
+        ) {
+            import(
+                restreamId: $restream_id
+                replace: $replace
+                spec: $spec
+            )
         }
     """
     )

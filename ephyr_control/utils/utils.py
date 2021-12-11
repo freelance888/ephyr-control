@@ -1,13 +1,20 @@
-import string
 import random
+import string
 
 import yarl
 
-__all__ = ("random_ascii_string", "generate_random_key_of_length", "build_rtmp_uri")
+__all__ = (
+    "random_ascii_string",
+    "generate_random_key_of_length",
+    "build_rtmp_uri",
+)
 
 
 def random_ascii_string(
-    length: int, uppercase: bool = True, lowercase: bool = True, digits: bool = True
+    length: int,
+    uppercase: bool = True,
+    lowercase: bool = True,
+    digits: bool = True,
 ):
     pool = ""
     if uppercase:

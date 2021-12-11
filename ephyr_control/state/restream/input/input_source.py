@@ -1,7 +1,11 @@
 import dataclasses
 from typing import List
 
-from .failover_input import FailoverInput, main_input_factory, backup_input_factory
+from .failover_input import (
+    FailoverInput,
+    main_input_factory,
+    backup_input_factory,
+)
 
 __all__ = ("InputSource",)
 
@@ -16,7 +20,9 @@ class InputSource:
 
     def __post_init__(self):
         # ensure unique restream keys
-        if len({foi.key for foi in self.failover_inputs}) < len(self.failover_inputs):
+        if len({foi.key for foi in self.failover_inputs}) < len(
+            self.failover_inputs
+        ):
             raise ValueError("Not all FailoverInput keys are unique.")
 
     def get_foinput_by_key(self, foinput_key: str):

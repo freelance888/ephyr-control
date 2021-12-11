@@ -2,10 +2,10 @@ import dataclasses
 import uuid
 from typing import List
 
-from .failover_input import FailoverInput
-from .input_source import InputSource
 from ._mixins import _Input
 from .endpoint import Endpoint, rtmp_endpoint_factory
+from .failover_input import FailoverInput
+from .input_source import InputSource
 
 __all__ = ("NoFailoverInput", "Input", "UuidInput")
 
@@ -19,7 +19,9 @@ class Input(_Input):
     KEY_DEFAULT = "origin"
 
     key: str = KEY_DEFAULT
-    src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
+    src: InputSource or None = dataclasses.field(
+        default_factory=lambda: InputSource()
+    )
 
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:
@@ -47,7 +49,7 @@ class Input(_Input):
         endpoints: List[Endpoint] = None,
         enabled: bool = True,
         src: InputSource or None = None,
-    ) -> "_Input":
+    ) -> "Input":
         return super().with_random_key(
             key_prefix=key_prefix,
             key_random_chars=key_random_chars,
@@ -62,7 +64,7 @@ class Input(_Input):
         key_prefix: str = KEY_DEFAULT,
         input_key_prefixes: [str, str] or None = InputSource.FI_KEYS_DEFAULT,
         key_random_chars: int = FailoverInput.KEY_RANDOM_LENGTH_DEFAULT,
-    ) -> "InputSource":
+    ) -> "Input":
         if input_key_prefixes is None:
             src = None
         else:
