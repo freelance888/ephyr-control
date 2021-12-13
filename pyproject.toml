@@ -8,9 +8,9 @@ authors = ["Serhii Khalymon <sergiykhalimon@gmail.com>", "Illia Ananich <illia.a
 python = "^3.8"
 yarl = "^1.6"
 gql = {version = "^2.0", extras = ["requests"]}
-pre-commit = "^2.16.0"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "^2.16.0"
 black = "^21.12b0"
 flake8 = "^4.0.1"
 
