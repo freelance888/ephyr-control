@@ -6,14 +6,14 @@ Ephyr Control
 Client library that allow to control [Ephyr] streaming.
 
 ## Overview
-**Ephyr Control** allow to connect and control process of mixing of audio. Currently only changing audio volume is available. 
+**Ephyr Control** allow to connect and control process of mixing of audio.
+
+It uses GraphQL for communication with Ephyr servers. At this point, only synchronous `requests` transport is supported.
 
 ### Example of usage
-First of all you need to deploy [Ephyr] to the server. Setup config and push RTMP stream to [Ephyr] endpoint. At this poing you're able to control actual process of mixing.
+First you need to deploy [Ephyr] to the server.
  
-# TODO:
-* new usage example
-
+See `examples` folder for code examples.
 
 ## License
 
