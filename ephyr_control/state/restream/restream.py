@@ -8,7 +8,7 @@ from .input import Input, FailoverInput
 from .output import Output
 from ..constant import RESTREAM_KEY_MAXLENGTH
 
-__all__ = ("Restream",)
+__all__ = ("Restream", "UuidRestream", "HostAwareRestream")
 
 
 @dataclasses.dataclass
