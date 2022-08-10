@@ -2,14 +2,21 @@ import dataclasses
 
 __all__ = ("EphyrInstance",)
 
+from typing import Optional
+
 
 @dataclasses.dataclass
 class EphyrInstance:
     ipv4: str
-    domain: str = None
-    title: str = None
-    password: str = None
-    https: bool = True
+    """ IPv4 address of the instance. """
+    domain: Optional[str] = None
+    """ Useful for making links. """
+    title: Optional[str] = None
+    """ Human-readable name of that instance. """
+    password: Optional[str] = None
+    """ Leave None to access without password. """
+    https: Optional[bool] = True
+    """ Impacts port: 443 for https=True, 80 for https=False """
 
     @property
     def ip(self) -> str:
