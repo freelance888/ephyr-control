@@ -9,11 +9,13 @@ __all__ = ("dtcls_to_json", "pretty_dtcls_to_json")
 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
-    """
-    https://stackoverflow.com/a/51286749/6233648
+    """JSON encoder.
+
+    Extended to process specific object types as well.
+    Credit: https://stackoverflow.com/a/51286749/6233648
     """
 
-    def default(self, o):
+    def default(self, o):  # noqa: WPS111
         if dataclasses.is_dataclass(o):
             return dataclasses.asdict(o)
         elif isinstance(o, yarl.URL):
@@ -27,5 +29,8 @@ dtcls_to_json = partial(json.dumps, cls=EnhancedJSONEncoder)
 
 # pretty JSON https://docs.python.org/3/library/json.html
 pretty_dtcls_to_json = partial(
-    json.dumps, cls=EnhancedJSONEncoder, sort_keys=True, indent=2
+    json.dumps,
+    cls=EnhancedJSONEncoder,
+    sort_keys=True,
+    indent=2,
 )

@@ -19,9 +19,7 @@ class Input(_Input):
     KEY_DEFAULT = "origin"
 
     key: str = KEY_DEFAULT
-    src: InputSource or None = dataclasses.field(
-        default_factory=lambda: InputSource()
-    )
+    src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
 
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:

@@ -20,9 +20,7 @@ class InputSource:
 
     def __post_init__(self):
         # ensure unique restream keys
-        if len({foi.key for foi in self.failover_inputs}) < len(
-            self.failover_inputs
-        ):
+        if len({foi.key for foi in self.failover_inputs}) < len(self.failover_inputs):
             raise ValueError("Not all FailoverInput keys are unique.")
 
     def get_foinput_by_key(self, foinput_key: str):

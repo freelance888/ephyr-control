@@ -16,9 +16,7 @@ __all__ = ("RemoteEphyrInstance",)
 class RemoteEphyrInstance(EphyrInstance):
     _client: gql.Client = None
 
-    EPHYR_GRAPHQL_URL_TEMPLATE: ClassVar[
-        str
-    ] = "{scheme}://:{password}@{host}/api"
+    EPHYR_GRAPHQL_URL_TEMPLATE: ClassVar[str] = "{scheme}://:{password}@{host}/api"
 
     Transport: ClassVar[Type] = gql.transport.requests.RequestsHTTPTransport
 
@@ -38,8 +36,7 @@ class RemoteEphyrInstance(EphyrInstance):
     def _build_client(self) -> gql.Client:
         url = self._build_remote_url()
         transport = self.Transport(url=url)
-        client = gql.Client(transport=transport)
-        return client
+        return gql.Client(transport=transport)
 
     def execute(self, query: gql.gql, variable_values: dict = None):
         return self.client.execute(
@@ -80,16 +77,12 @@ class RemoteEphyrInstance(EphyrInstance):
     def _change_password(self, new_password: str or None) -> dict:
         return self.execute(
             self.gql_change_password,
-            variable_values=dict(
-                new=new_password,
-                old=self.password,
-                kind="MAIN",
-            ),
+            variable_values={"new": new_password, "old": self.password, "kind": "MAIN"},
         )
 
     def change_password(self, new_password: str or None) -> bool:
-        result = self._change_password(new_password=new_password)
-        success = result["setPassword"]
+        response = self._change_password(new_password=new_password)
+        success = response["setPassword"]
         if success:
             self.password = new_password
             self._client = self._build_client()

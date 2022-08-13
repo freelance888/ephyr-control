@@ -23,7 +23,9 @@ def random_ascii_string(
         pool += string.ascii_lowercase
     if digits:
         pool += string.digits
-    return "".join(random.choices(pool, k=length))
+
+    # This shouldn't be a concern for a password transferred over network
+    return "".join(random.choices(pool, k=length))  # noqa: S311
 
 
 def generate_random_key_of_length(length: int) -> str:

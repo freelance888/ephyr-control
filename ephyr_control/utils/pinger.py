@@ -55,6 +55,49 @@ class Pinger:
             headers["User-Agent"] = self.user_agent
         return headers
 
+    def ping(self) -> bool:
+        self.logger.debug(f"Pinging {self.target} ...")
+        success = self._ping()
+        if success:
+            self.logger.info(f"Successful ping from {self.target}")
+        else:
+            self.logger.warning(f"Failed to ping {self.target}")
+        return success
+
+    def retrying_ping(self) -> bool:
+        self.logger.info(f"Immediate first attempt to ping {self.target} :")
+        try:
+            success = self.ping()
+        except IOError:
+            ...
+        else:
+            if success:
+                return True
+
+        for attempt in range(2, self.max_retries + 1):
+            self.logger.debug(f"Waiting for {self.timeout} second ...")
+            self._wait(self.timeout)
+            self.logger.info(f"{attempt}th attempt to ping {self.target} :")
+            if self.ping():
+                return True
+
+        self.logger.warning(
+            f"All {self.max_retries} attempts to ping {self.target} failed"
+        )
+        return False
+
+    def interactive_ping(self) -> bool:
+        gave_up = False
+        while not gave_up:
+            if self.retrying_ping():
+                return True
+            else:
+                gave_up = input(
+                    "Do you want continue ping attempts? (y/N) "
+                ).lower() not in {"y", "yes"}
+
+        return False
+
     @property
     def target(self) -> str:
         return str(self.target_url)
@@ -68,7 +111,7 @@ class Pinger:
 
     def _ping(self) -> bool:
         resp = None
-        try:
+        try:  # noqa: WPS229
             headers = self.build_headers()
             resp = self._requests_get(self.target, headers)
         except requests.exceptions.RequestException as exc:
@@ -80,7 +123,7 @@ class Pinger:
         finally:
             if resp:
                 self.logger.debug(
-                    f"Response: [{len(resp.content)}] {resp.content}"
+                    f"Response: [{len(resp.content)}] {resp.content}"  # noqa: WPS237
                 )
 
         if not self.do_raise_for_status:
@@ -97,49 +140,6 @@ class Pinger:
         else:
             return True
 
-    def ping(self) -> bool:
-        self.logger.debug(f"Pinging {self.target} ...")
-        success = self._ping()
-        if success:
-            self.logger.info(f"Successful ping from {self.target}")
-        else:
-            self.logger.warning(f"Failed to ping {self.target}")
-        return success
-
     @staticmethod
     def _wait(seconds: float):
         time.sleep(seconds)
-
-    def retrying_ping(self) -> bool:
-        try:
-            self.logger.info(f"Immediate first attempt to ping {self.target} :")
-            success = self.ping()
-        except IOError:
-            pass
-        else:
-            if success:
-                return True
-
-        for i in range(2, self.max_retries + 1):
-            self.logger.debug(f"Waiting for {self.timeout} second ...")
-            self._wait(self.timeout)
-            self.logger.info(f"{i}th attempt to ping {self.target} :")
-            if self.ping():
-                return True
-        else:
-            self.logger.warning(
-                f"All {self.max_retries} attempts to ping {self.target} failed"
-            )
-            return False
-
-    def interactive_ping(self) -> bool:
-        gave_up = False
-        while not gave_up:
-            if not self.retrying_ping():
-                gave_up = input(
-                    "Do you want continue ping attempts? (y/N) "
-                ).lower() not in {"y", "yes"}
-            else:
-                return True
-        else:
-            return False

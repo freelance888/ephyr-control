@@ -8,4 +8,5 @@ class Endpoint:
     kind: str
 
 
-rtmp_endpoint_factory = lambda: Endpoint(kind="rtmp")
+def rtmp_endpoint_factory():
+    Endpoint(kind="rtmp")

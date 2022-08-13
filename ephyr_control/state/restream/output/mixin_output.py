@@ -10,7 +10,8 @@ __all__ = ("Mixin", "OutputWithMixins", "UuidOutputWithMixins")
 
 @dataclasses.dataclass
 class Mixin:
-    """
+    """Mixin is Ephyr's name for entity that mixes audio and video.
+
     Note: this class is no a "mixin" by the standard meaning of this word
     in Python OOP.
     It only referes to an entity in Ephyr state structure that mixes

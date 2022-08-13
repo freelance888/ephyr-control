@@ -20,9 +20,7 @@ class _KeyedMixin:
     key: str
 
     # Epyr restriction. must be overwritten by inheritor
-    KEY_MAXLENGTH: ClassVar[int] = min(
-        INPUT_KEY_MAXLENGTH, RESTREAM_KEY_MAXLENGTH
-    )
+    KEY_MAXLENGTH: ClassVar[int] = min(INPUT_KEY_MAXLENGTH, RESTREAM_KEY_MAXLENGTH)
 
     # Constants of this implementation
     KEY_SEP: ClassVar[str] = "_"
@@ -42,9 +40,7 @@ class _KeyedMixin:
         elif length < 0:
             raise ValueError("length must be positive")
         random_suffix = generate_random_key_of_length(
-            length=length
-            if length is not None
-            else cls.KEY_RANDOM_LENGTH_DEFAULT,
+            length=length if length is not None else cls.KEY_RANDOM_LENGTH_DEFAULT,
         )
         return prefix + cls.KEY_SEP + random_suffix
 
