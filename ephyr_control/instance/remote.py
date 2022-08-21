@@ -1,48 +1,102 @@
 import dataclasses
 import logging
-from typing import ClassVar, Type
+from typing import ClassVar, Type, Optional, Dict, Any, Tuple
 
 import gql
 import gql.transport.requests
+import yarl
 
-from .instance import EphyrInstance
-from .. import State, Settings
-from ..utils import Pinger
+from ephyr_control.instance.constants import EphyrApiPaths, ALL_API_PATHS
+from ephyr_control.instance.instance import EphyrInstance
+from ephyr_control.instance.protocols import (
+    RemoteEphyrInstanceProtocol,
+    ServerConnectionDetails,
+    AssignedClientProtocol,
+    ClientsCollectionProtocol,
+    AssignedMethodCall,
+)
+from ephyr_control.instance.queries import (
+    api_change_settings,
+    api_change_state,
+    api_change_password,
+    api_get_info,
+    api_export_all_restreams,
+)
+from ephyr_control.state.settings import Settings
+from ephyr_control.state.state import State
+from ephyr_control.utils.pinger import Pinger
 
-__all__ = ("RemoteEphyrInstance",)
+__all__ = (
+    "AssignedClient",
+    "ClientsCollection",
+    "BaseRemoteEphyrInstance",
+    "RemoteEphyrInstance",
+)
 
 
 @dataclasses.dataclass
-class RemoteEphyrInstance(EphyrInstance):
-    _client: gql.Client = None
+class AssignedClient(AssignedClientProtocol):
+    api_path: EphyrApiPaths
+    client: gql.Client = None
 
-    EPHYR_GRAPHQL_URL_TEMPLATE: ClassVar[str] = "{scheme}://:{password}@{host}/api"
+    Transport: ClassVar[
+        Type[gql.transport.Transport]
+    ] = gql.transport.requests.RequestsHTTPTransport
 
-    Transport: ClassVar[Type] = gql.transport.requests.RequestsHTTPTransport
-
-    @property
-    def client(self) -> gql.Client:
-        if not self._client:
-            self._client = self._build_client()
-        return self._client
-
-    def _build_remote_url(self) -> str:
-        return self.EPHYR_GRAPHQL_URL_TEMPLATE.format(
-            scheme=self.scheme,
-            host=self.host,
-            password=self.password or "",
+    def rebuild_client(
+        self, server_connection_details: ServerConnectionDetails
+    ) -> None:
+        url = yarl.URL.build(
+            scheme=server_connection_details.scheme,
+            host=server_connection_details.host,
+            password=server_connection_details.password or "",
+            path=self.api_path.value,
         )
 
-    def _build_client(self) -> gql.Client:
-        url = self._build_remote_url()
-        transport = self.Transport(url=url)
-        return gql.Client(transport=transport)
+        transport = self.Transport(url=str(url))
+        self.client = gql.Client(transport=transport)
 
-    def execute(self, query: gql.gql, variable_values: dict = None):
+    def execute(
+        self,
+        method_call: AssignedMethodCall,
+        variable_values: Optional[Dict[str, Any]] = None,
+    ) -> dict:
+        if not self.is_initialised:
+            raise self.ClientNotInitialisedError(
+                "Client was not initialised yet. Call rebuild_client method."
+            )
+
+        if self.api_path != method_call.api_path:
+            raise ValueError("api_path does not match")
+
         return self.client.execute(
-            query,
+            method_call.query,
             variable_values=variable_values,
         )
+
+
+@dataclasses.dataclass
+class ClientsCollection(ClientsCollectionProtocol):
+    clients: Tuple[AssignedClientProtocol, ...]
+    assigned_clients: Dict[EphyrApiPaths, AssignedClientProtocol] = dataclasses.field(
+        init=False
+    )
+
+    def __post_init__(self):
+        self.assigned_clients = {client.api_path: client for client in self.clients}
+
+
+@dataclasses.dataclass
+class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
+    """Base class implementing RemoteEphyrInstanceProtocol"""
+
+    connect_to: Tuple[EphyrApiPaths, ...] = ALL_API_PATHS
+
+    def __post_init__(self):
+        self.clients = ClientsCollection(
+            tuple(AssignedClient(api) for api in self.connect_to)
+        )
+        self.rebuild_clients()
 
     def ping(
         self,
@@ -66,119 +120,63 @@ class RemoteEphyrInstance(EphyrInstance):
         )
         return pinger.ping()
 
-    gql_change_password = gql.gql(
-        """
-        mutation ($new: String, $old: String, $kind: PasswordKind!) {
-            setPassword(new: $new, old: $old, kind: $kind)
-        }
-    """
-    )
-
-    def _change_password(self, new_password: str or None) -> dict:
-        return self.execute(
-            self.gql_change_password,
-            variable_values={"new": new_password, "old": self.password, "kind": "MAIN"},
+    def get_connection_details(self) -> ServerConnectionDetails:
+        return ServerConnectionDetails(
+            scheme=self.scheme,
+            host=self.host,
+            port=self.port,
+            password=self.password,
         )
 
-    def change_password(self, new_password: str or None) -> bool:
-        response = self._change_password(new_password=new_password)
-        success = response["setPassword"]
-        if success:
-            self.password = new_password
-            self._client = self._build_client()
-        return success
 
-    gql_change_settings = gql.gql(
-        """
-        mutation SetSettings(
-            $title: String
-            $delete_confirmation: Boolean!
-            $enable_confirmation: Boolean!
-        ) {
-            setSettings(
-                title: $title
-                deleteConfirmation: $delete_confirmation
-                enableConfirmation: $enable_confirmation
-            )
-        }
-    """
-    )
-
-    def _change_settings(self, settings: Settings) -> dict:
-        variables = settings.to_dict()
-        return self.execute(
-            self.gql_change_settings,
-            variable_values=variables,
-        )
-
-    def change_settings(self, settings: Settings) -> bool:
-        result = self._change_settings(settings=settings)
-        success = result["setSettings"]
-        return success
-
-    gql_change_state = gql.gql(
-        """
-        mutation Import(
-            $restream_id: RestreamId
-            $replace: Boolean!
-            $spec: String!
-        ) {
-            import(
-                restreamId: $restream_id
-                replace: $replace
-                spec: $spec
-            )
-        }
-    """
-    )
-
-    def _change_state(self, state: State, replace: bool = False) -> dict:
-        variables = dict(
-            restream_id=None,
-            replace=replace,
-            spec=state.to_json(cleanup=True, prettify=False),
-        )
-        return self.execute(
-            self.gql_change_state,
-            variable_values=variables,
-        )
-
-    def change_state(self, state: State, replace: bool = False) -> bool:
-        result = self._change_state(state=state, replace=replace)
-        success = result["import"]
-        return success
-
-    gql_get_info = gql.gql(
-        """
-        query Info {
-            info {
-                publicHost
-                title
-                passwordHash
-                passwordOutputHash
-                deleteConfirmation
-                enableConfirmation
-            }
-        }
-    """
-    )
+@dataclasses.dataclass
+class RemoteEphyrInstance(BaseRemoteEphyrInstance):
+    """Implements concrete actions on Ephyr server."""
 
     def get_info(self) -> dict:
-        data = self.execute(self.gql_get_info)
+        data = self.execute(api_get_info)
         return data["info"]
-
-    gql_export_all_restreams = gql.gql(
-        """
-        query ExportAllRestreams {
-            export
-        }
-    """
-    )
-
-    def _export_all_restreams(self) -> dict:
-        data = self.execute(self.gql_export_all_restreams)
-        return data["export"]
 
     def verify_ipv4_domain_match(self) -> bool:
         public_host = self.get_info()["publicHost"]
         return public_host == self.ipv4
+
+    def change_password(self, new_password: str or None) -> bool:
+        variables = {
+            "new": new_password,
+            "old": self.password,
+            "kind": "MAIN",
+        }
+        response = self.execute(
+            api_change_password,
+            variable_values=variables,
+        )
+        success: bool = response["setPassword"]
+        if success:
+            self.password = new_password
+            self.rebuild_clients()
+        return success
+
+    def change_settings(self, settings: Settings) -> bool:
+        variables = settings.to_dict()
+        response = self.execute(
+            api_change_settings,
+            variable_values=variables,
+        )
+        return response["setSettings"]
+
+    def change_state(self, state: State, replace: bool = False) -> bool:
+        variables = {
+            "restream_id": None,
+            "replace": replace,
+            "spec": state.to_json(cleanup=True, prettify=False),
+        }
+        response = self.execute(
+            api_change_state,
+            variable_values=variables,
+        )
+        return response["import"]
+
+    def export_all_restreams_raw(self) -> dict:
+        data = self.execute(api_export_all_restreams)
+        return data["export"]

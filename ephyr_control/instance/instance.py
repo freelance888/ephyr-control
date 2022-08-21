@@ -4,9 +4,11 @@ __all__ = ("EphyrInstance",)
 
 from typing import Optional
 
+from ephyr_control.instance.protocols import EphyrInstanceProtocol
+
 
 @dataclasses.dataclass
-class EphyrInstance:
+class EphyrInstance(EphyrInstanceProtocol):
     """Ephyr instance - represents one server with its address.
     Connects to server using provided arguments and can perform simple actions on it.
 
@@ -22,7 +24,7 @@ class EphyrInstance:
     domain: Optional[str] = None
     title: Optional[str] = None
     password: Optional[str] = None
-    https: Optional[bool] = True
+    https: bool = True
 
     @property
     def ip(self) -> str:
@@ -31,7 +33,6 @@ class EphyrInstance:
     @property
     def host(self) -> str:
         return self.domain or self.ipv4
-        # return self.ipv4
 
     @property
     def port(self) -> int:
@@ -42,6 +43,7 @@ class EphyrInstance:
         return "https" if self.https else "http"
 
     def print(self):
+        """Print data about itself."""
         host = self.domain if self.domain else self.ipv4
         address = f"{self.scheme}://{host}/"
         extra = " (" + str(self.ipv4) + ")" if self.domain else ""
