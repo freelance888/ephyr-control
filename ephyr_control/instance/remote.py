@@ -12,6 +12,7 @@ from ephyr_control.instance.constants import (
     EphyrApiPaths,
     ALL_API_PATHS,
     EphyrPasswordKind,
+    MIXIN_UI_PATH,
 )
 from ephyr_control.instance.instance import EphyrInstance
 from ephyr_control.instance.protocols import (
@@ -150,6 +151,35 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
             port=connection_details.port,
             path=path,
         )
+
+    def build_output_url(
+        self,
+        restream_id: uuid.UUID,
+        output_id: uuid.UUID,
+        output_password: Optional[str] = None,
+    ) -> yarl.URL:
+        """
+        Construct URL for concrete Output UI page.
+        :param restream_id: uuid of Restream
+        :param output_id: uuid of Output
+        :param output_password: optional, provide password if it is set for Output UI
+        :return:
+        """
+        # use more verbose UUID format because this URL might be used by users
+        query = {
+            "id": str(restream_id),
+            "output": str(output_id),
+        }
+        base = self.build_url().with_path(MIXIN_UI_PATH).with_query(query)
+
+        if output_password:
+            # override auth
+            return base.with_password(output_password).with_user(
+                self.DEFAULT_USER_HTTPAUTH
+            )
+        else:
+            # remove user because there's no password
+            return base.with_password(None).with_user(None)
 
 
 @dataclasses.dataclass

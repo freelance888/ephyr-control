@@ -1,10 +1,14 @@
 import enum
 
 __all__ = (
+    "MIXIN_UI_PATH",
     "EphyrPasswordKind",
     "EphyrApiPaths",
     "ALL_API_PATHS",
 )
+
+
+MIXIN_UI_PATH = "/mix"
 
 
 class EphyrPasswordKind(enum.Enum):
