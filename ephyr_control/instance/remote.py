@@ -8,7 +8,11 @@ import gql
 import gql.transport.requests
 import yarl
 
-from ephyr_control.instance.constants import EphyrApiPaths, ALL_API_PATHS
+from ephyr_control.instance.constants import (
+    EphyrApiPaths,
+    ALL_API_PATHS,
+    EphyrPasswordKind,
+)
 from ephyr_control.instance.instance import EphyrInstance
 from ephyr_control.instance.protocols import (
     RemoteEphyrInstanceProtocol,
@@ -164,7 +168,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         public_host = self.get_info()["publicHost"]
         return public_host == self.ipv4
 
-    def change_password(self, new_password: str or None) -> bool:
+    def change_password(
+        self,
+        new_password: str or None,
+    ) -> bool:
         """
         Change password. Set to None to remove password protection.
         :param new_password: string of new password (as user types it), set
@@ -174,7 +181,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         variables = {
             "new": new_password,
             "old": self.password,
-            "kind": "MAIN",
+            "kind": EphyrPasswordKind.MAIN.value,
         }
         response = self.execute(
             api_change_password,

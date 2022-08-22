@@ -1,6 +1,21 @@
 import enum
 
-__all__ = ("EphyrApiPaths", "ALL_API_PATHS")
+__all__ = (
+    "EphyrPasswordKind",
+    "EphyrApiPaths",
+    "ALL_API_PATHS",
+)
+
+
+class EphyrPasswordKind(enum.Enum):
+    """Collection of password kinds (types).
+
+    MAIN - for main UI (with restreams)
+    OUTPUT - for pages regarding concrete output's UI
+    """
+
+    MAIN = "MAIN"
+    OUTPUT = "OUTPUT"
 
 
 class EphyrApiPaths(enum.Enum):
