@@ -187,6 +187,7 @@ class RemoteEphyrInstanceProtocol(EphyrInstanceProtocol, Protocol):
             method_call=method_call, variable_values=variable_values
         )
 
+    @abc.abstractmethod
     def verify_ipv4_domain_match(self) -> bool:
         """
         Checks if provided IPv4 matches the actual one.

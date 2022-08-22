@@ -12,7 +12,7 @@ class EphyrApiPaths(enum.Enum):
     """
 
     API = "/api"
-    DASHBOARD = "/dashboard"
+    DASHBOARD = "/api-dashboard"
 
 
 ALL_API_PATHS = tuple(EphyrApiPaths)

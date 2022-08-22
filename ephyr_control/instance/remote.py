@@ -134,6 +134,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
     """Implements concrete actions on Ephyr server."""
 
     def get_info(self) -> dict:
+        """
+        Get basic info about instance (title, publicHost, some settings)
+        :return: dictionary
+        """
         data = self.execute(api_get_info)
         return data["info"]
 
@@ -142,6 +146,12 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         return public_host == self.ipv4
 
     def change_password(self, new_password: str or None) -> bool:
+        """
+        Change password. Set to None to remove password protection.
+        :param new_password: string of new password (as user types it), set
+        None to remove password protection
+        :return: success
+        """
         variables = {
             "new": new_password,
             "old": self.password,
@@ -158,6 +168,11 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         return success
 
     def change_settings(self, settings: Settings) -> bool:
+        """
+        Change only settings of the Ephyr instance.
+        :param settings: Settings object
+        :return: success
+        """
         variables = settings.to_dict()
         response = self.execute(
             api_change_settings,
@@ -166,6 +181,12 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         return response["setSettings"]
 
     def change_state(self, state: State, replace: bool = False) -> bool:
+        """
+        Change state (includes settings and restreams) of the Ephyr isntance.
+        :param state: State object
+        :param replace: # FIXME
+        :return: success
+        """
         variables = {
             "restream_id": None,
             "replace": replace,
@@ -177,6 +198,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         )
         return response["import"]
 
-    def export_all_restreams_raw(self) -> dict:
+    def export_all_restreams_raw(self) -> str:
+        """
+        Export all restreams' data in as string JSON.
+        :return: JSON string
+        """
         data = self.execute(api_export_all_restreams)
         return data["export"]
