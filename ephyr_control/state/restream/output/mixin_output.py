@@ -21,6 +21,7 @@ class Mixin:
     src: str
     volume: Volume = None
     delay: str = "3s 500ms"
+    sidechain: bool = False
 
     @classmethod
     def from_dict(cls, d: dict) -> "Mixin":
