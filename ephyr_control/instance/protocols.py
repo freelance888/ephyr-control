@@ -3,7 +3,7 @@ import dataclasses
 from typing import Protocol, Any, Dict, Optional, ClassVar, Type, Collection
 
 import yarl
-from graphql.language.ast import Document as GqlDocument
+from graphql import DocumentNode as GqlDocument
 
 from ephyr_control.instance.constants import EphyrApiPaths
 
