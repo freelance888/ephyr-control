@@ -11,6 +11,9 @@ __all__ = (
     "api_change_settings",
     "api_change_state",
     "api_export_all_restreams",
+    "mixin_tune_volume",
+    "mixin_tune_delay",
+    "mixin_tune_sidechain",
     "dashboard_add_client",
     "dashboard_remove_client",
 )
@@ -94,6 +97,75 @@ api_export_all_restreams = AssignedMethodCall(
             export
         }
     """
+    ),
+)
+
+
+# output mixin API queries
+# ================
+
+mixin_tune_volume = AssignedMethodCall(
+    api_path=EphyrApiPaths.MIXIN,
+    query=gql.gql(
+        """
+        mutation TuneVolume(
+            $restream_id: RestreamId!
+            $output_id: OutputId!
+            $mixin_id: MixinId
+            $level: VolumeLevel!
+            $muted: Boolean!
+        ) {
+            tuneVolume(
+                restreamId: $restream_id
+                outputId: $output_id
+                mixinId: $mixin_id
+                level: $level
+                muted: $muted
+            )
+        }
+        """
+    ),
+)
+
+mixin_tune_delay = AssignedMethodCall(
+    api_path=EphyrApiPaths.MIXIN,
+    query=gql.gql(
+        """
+        mutation TuneDelay(
+            $restream_id: RestreamId!
+            $output_id: OutputId!
+            $mixin_id: MixinId!
+            $delay: Delay!
+        ) {
+            tuneDelay(
+                restreamId: $restream_id
+                outputId: $output_id
+                mixinId: $mixin_id
+                delay: $delay
+            )
+        }
+        """
+    ),
+)
+
+mixin_tune_sidechain = AssignedMethodCall(
+    api_path=EphyrApiPaths.MIXIN,
+    query=gql.gql(
+        """
+        mutation TuneSidechain(
+            $restream_id: RestreamId!
+            $output_id: OutputId!
+            $mixin_id: MixinId!
+            $sidechain: Boolean!
+        ) {
+            tuneSidechain(
+                restreamId: $restream_id
+                outputId: $output_id
+                mixinId: $mixin_id
+                sidechain: $sidechain
+            )
+        }
+        """
     ),
 )
 

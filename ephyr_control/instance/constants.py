@@ -8,10 +8,12 @@ class EphyrApiPaths(enum.Enum):
     Should start with '/'.
 
     /api - main API
-    /dashboard - API for dashboard mode
+    /api-mix - API for output mixin
+    /api-dashboard - API for dashboard mode
     """
 
     API = "/api"
+    MIXIN = "/api-mix"
     DASHBOARD = "/api-dashboard"
 
 

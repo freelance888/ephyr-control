@@ -1,6 +1,7 @@
 import dataclasses
 import json
 import logging
+import uuid
 from typing import ClassVar, Type, Optional, Dict, Any, Tuple
 
 import gql
@@ -22,9 +23,13 @@ from ephyr_control.instance.queries import (
     api_change_password,
     api_get_info,
     api_export_all_restreams,
+    mixin_tune_volume,
+    mixin_tune_delay,
+    mixin_tune_sidechain,
     dashboard_add_client,
     dashboard_remove_client,
 )
+from ephyr_control.state.restream.output.volume import Volume
 from ephyr_control.state.settings import Settings
 from ephyr_control.state.state import State
 from ephyr_control.utils.pinger import Pinger
@@ -250,3 +255,77 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         }
         response = self.execute(dashboard_remove_client, variable_values=variables)
         return response["removeClient"]
+
+    def tune_volume(
+        self,
+        restream_id: uuid.UUID,
+        output_id: uuid.UUID,
+        volume: Volume,
+        mixin_id: Optional[uuid.UUID] = None,
+    ) -> bool:
+        """
+        Set volume options for output's main source or one of it's mixins.
+        :param restream_id: uuid of Restream
+        :param output_id: uuid of Output
+        :param mixin_id: optional, if None - applies for main source (e.g. not a mixin)
+        :param volume: Volume object containing
+        :return: success
+        """
+        variables = {
+            "restream_id": restream_id.hex,
+            "output_id": output_id.hex,
+            "mixin_id": mixin_id.hex,
+            "level": volume.level,
+            "muted": volume.muted,
+        }
+        response = self.execute(mixin_tune_volume, variable_values=variables)
+        return response["tuneVolume"]
+
+    def tune_delay(
+        self,
+        restream_id: uuid.UUID,
+        output_id: uuid.UUID,
+        mixin_id: uuid.UUID,
+        delay_milliseconds: int,
+    ) -> bool:
+        """
+        Set delay option for output's mixin.
+        :param restream_id: uuid of Restream
+        :param output_id: uuid of Output
+        :param mixin_id: uuid of Mixin
+        :param delay_milliseconds: delay in milliseconds, controls by how much
+        mixin stream will be delayed relatively to main stream.
+        :return: success
+        """
+        variables = {
+            "restream_id": restream_id.hex,
+            "output_id": output_id.hex,
+            "mixin_id": mixin_id.hex,
+            "delay": delay_milliseconds,
+        }
+        response = self.execute(mixin_tune_delay, variable_values=variables)
+        return response["tuneDelay"]
+
+    def tune_sidechain(
+        self,
+        restream_id: uuid.UUID,
+        output_id: uuid.UUID,
+        mixin_id: uuid.UUID,
+        sidechain_enabled: bool,
+    ) -> bool:
+        """
+        Set sidechain option for output's mixin.
+        :param restream_id: uuid of Restream
+        :param output_id: uuid of Output
+        :param mixin_id: uuid of Mixin
+        :param sidechain_enabled: state of sidechain feature
+        :return: success
+        """
+        variables = {
+            "restream_id": restream_id.hex,
+            "output_id": output_id.hex,
+            "mixin_id": mixin_id.hex,
+            "sidechain": sidechain_enabled,
+        }
+        response = self.execute(mixin_tune_sidechain, variable_values=variables)
+        return response["tuneSidechain"]
