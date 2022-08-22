@@ -2,6 +2,7 @@ import abc
 import dataclasses
 from typing import Protocol, Any, Dict, Optional, ClassVar, Type, Collection
 
+import yarl
 from graphql.language.ast import Document as GqlDocument
 
 from ephyr_control.instance.constants import EphyrApiPaths
@@ -163,6 +164,10 @@ class RemoteEphyrInstanceProtocol(EphyrInstanceProtocol, Protocol):
             port=self.port,
             password=self.password,
         )
+
+    @abc.abstractmethod
+    def build_url(self) -> yarl.URL:
+        """Build URL for visiting instance."""
 
     def rebuild_clients(self) -> None:
         """Rebuild all clients in collection.

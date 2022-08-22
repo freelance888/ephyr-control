@@ -92,6 +92,9 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
 
     connect_to: Tuple[EphyrApiPaths, ...] = ALL_API_PATHS
 
+    # username used for BasicAuth, 1 is well accepted by browsers
+    DEFAULT_USER_HTTPAUTH: str = "1"
+
     def __post_init__(self):
         self.clients = ClientsCollection(
             tuple(AssignedClient(api) for api in self.connect_to)
@@ -120,12 +123,20 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
         )
         return pinger.ping()
 
-    def get_connection_details(self) -> ServerConnectionDetails:
-        return ServerConnectionDetails(
-            scheme=self.scheme,
-            host=self.host,
-            port=self.port,
-            password=self.password,
+    def build_url(self, dashboard: bool = False) -> yarl.URL:
+        # TODO: add arguments to connect to mixin output
+        connection_details = self.get_connection_details()
+        if dashboard:
+            path = "/dashboard"
+        else:
+            path = "/"
+        return yarl.URL.build(
+            scheme=connection_details.scheme,
+            user=self.DEFAULT_USER_HTTPAUTH if connection_details.password else None,
+            password=connection_details.password,
+            host=connection_details.host,
+            port=connection_details.port,
+            path=path,
         )
 
 
