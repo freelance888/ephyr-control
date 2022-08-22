@@ -1,4 +1,5 @@
 import dataclasses
+import json
 import logging
 from typing import ClassVar, Type, Optional, Dict, Any, Tuple
 
@@ -211,13 +212,14 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         )
         return response["import"]
 
-    def export_all_restreams_raw(self) -> str:
+    def export(self) -> dict:
         """
-        Export all restreams' data in as string JSON.
-        :return: JSON string
+        Export Ephyr server data (includes restreams and settings).
+        :return: dict with data
         """
         data = self.execute(api_export_all_restreams)
-        return data["export"]
+        as_string = data["export"]
+        return json.loads(as_string)
 
     def add_instance_to_dashboard(
         self,
@@ -225,6 +227,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
     ) -> bool:
         """Add another instance to Dashboard UI.
 
+        :param instance: Ephyr instance to add to dashboard
         :return: success status
         """
         variables = {
@@ -239,6 +242,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
     ) -> bool:
         """Remove another instance from Dashboard UI
 
+        :param instance: Ephyr instance to remove from dashboard
         :return: success status
         """
         variables = {
