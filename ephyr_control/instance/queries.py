@@ -11,8 +11,13 @@ __all__ = (
     "api_change_settings",
     "api_change_state",
     "api_export_all_restreams",
+    "dashboard_add_client",
+    "dashboard_remove_client",
 )
 
+
+# main API queries
+# ================
 
 api_get_info = AssignedMethodCall(
     api_path=EphyrApiPaths.API,
@@ -89,5 +94,31 @@ api_export_all_restreams = AssignedMethodCall(
             export
         }
     """
+    ),
+)
+
+
+# Dashboard API queries
+# =====================
+
+dashboard_add_client = AssignedMethodCall(
+    api_path=EphyrApiPaths.DASHBOARD,
+    query=gql.gql(
+        """
+        mutation AddClient($client_id: ClientId!) {
+            addClient(clientId: $client_id)
+        }
+        """
+    ),
+)
+
+dashboard_remove_client = AssignedMethodCall(
+    api_path=EphyrApiPaths.DASHBOARD,
+    query=gql.gql(
+        """
+        mutation RemoveClient($client_id: ClientId!) {
+            removeClient(clientId: $client_id)
+        }
+        """
     ),
 )

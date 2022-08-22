@@ -21,6 +21,8 @@ from ephyr_control.instance.queries import (
     api_change_password,
     api_get_info,
     api_export_all_restreams,
+    dashboard_add_client,
+    dashboard_remove_client,
 )
 from ephyr_control.state.settings import Settings
 from ephyr_control.state.state import State
@@ -216,3 +218,31 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         """
         data = self.execute(api_export_all_restreams)
         return data["export"]
+
+    def add_instance_to_dashboard(
+        self,
+        instance: RemoteEphyrInstanceProtocol,
+    ) -> bool:
+        """Add another instance to Dashboard UI.
+
+        :return: success status
+        """
+        variables = {
+            "client_id": str(instance.build_url()),
+        }
+        response = self.execute(dashboard_add_client, variable_values=variables)
+        return response["addClient"]
+
+    def remove_instance_from_dashboard(
+        self,
+        instance: RemoteEphyrInstanceProtocol,
+    ) -> bool:
+        """Remove another instance from Dashboard UI
+
+        :return: success status
+        """
+        variables = {
+            "client_id": str(instance.build_url()),
+        }
+        response = self.execute(dashboard_remove_client, variable_values=variables)
+        return response["removeClient"]
