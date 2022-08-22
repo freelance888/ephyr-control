@@ -238,9 +238,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
 
     def change_state(self, state: State, replace: bool = False) -> bool:
         """
-        Change state (includes settings and restreams) of the Ephyr isntance.
+        Change state (includes settings and restreams) of the Ephyr instance.
         :param state: State object
-        :param replace: # FIXME
+        :param replace: if True, server will try to match objects and update their
+        configuration, otherwise - replace entire State.
         :return: success
         """
         variables = {
