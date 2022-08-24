@@ -11,6 +11,7 @@ __all__ = (
     "api_change_settings",
     "api_change_state",
     "api_export_all_restreams",
+    "api_subscribe_state",
     "mixin_tune_volume",
     "mixin_tune_delay",
     "mixin_tune_sidechain",
@@ -97,6 +98,79 @@ api_export_all_restreams = AssignedMethodCall(
             export
         }
     """
+    ),
+)
+
+api_subscribe_state = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        subscription State {
+            allRestreams {
+                id
+                key
+                label
+                input {
+                    id
+                    key
+                    endpoints {
+                        id
+                        kind
+                        status
+                        label
+                    }
+                    src {
+                        ... on RemoteInputSrc {
+                            url
+                            label
+                        }
+                        ... on FailoverInputSrc {
+                            inputs {
+                                id
+                                key
+                                endpoints {
+                                    id
+                                    kind
+                                    status
+                                    label
+                                }
+                                src {
+                                    ... on RemoteInputSrc {
+                                        url
+                                        label
+                                    }
+                                }
+                                enabled
+                            }
+                        }
+                    }
+                    enabled
+                }
+                outputs {
+                    id
+                    dst
+                    label
+                    previewUrl
+                    volume {
+                        level
+                        muted
+                    }
+                    mixins {
+                        id
+                        src
+                        volume {
+                            level
+                            muted
+                        }
+                        delay
+                        sidechain
+                    }
+                    enabled
+                    status
+                }
+            }
+        }
+        """
     ),
 )
 
