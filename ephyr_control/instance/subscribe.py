@@ -1,8 +1,8 @@
 """
 API to subscribe for Ephyr servers.
+Unlike most of the lib, it is developed for use in asyncio environment.
 
-Example usage:
-
+See example usage in examples/subscribe.py
 """
 
 import dataclasses
@@ -29,6 +29,12 @@ __all__ = (
 
 @dataclasses.dataclass(frozen=True)
 class Subscription:
+    """
+    Subscription manager for concrete Ephyr instance.
+    Does not update already created sessions.
+    Operates using websockets.
+    """
+
     instance: EphyrInstanceProtocol
     method_call: AssignedMethodCall
     use_ssl: Optional[bool] = None
@@ -43,6 +49,10 @@ class Subscription:
             raise ValueError("Only accept subscription operations.")
 
     def build_ws_url(self) -> yarl.URL:
+        """
+        Build URL for websocket connection.
+        :return: yarl.URL
+        """
         if self.use_ssl is None:
             use_ssl = self.instance.scheme == "https"
         else:
@@ -56,16 +66,31 @@ class Subscription:
         )
 
     def build_client(self) -> gql.Client:
+        """
+        Builds gql Client
+        :return: gql.Client
+        """
         url = self.build_ws_url()
         transport = self.Transport(str(url))
         return gql.Client(transport=transport)
 
     def session(self) -> "SubscriptionSession":
+        """
+        Create SubscriptionSession which is not updated by instance changes.
+        :return: session object
+        """
         return SubscriptionSession(subscription=self, client=self.build_client())
 
 
 @dataclasses.dataclass(frozen=True)
 class SubscriptionSession:
+    """
+    Session for subscription operation.
+    Does not react to changes in subscription.instance object
+    Acts as context manager - manages connection to server.
+    Returns UpdatesIterator upon entering context.
+    """
+
     subscription: Subscription
     client: gql.Client
 
@@ -79,12 +104,23 @@ class SubscriptionSession:
 
 @dataclasses.dataclass(frozen=True)
 class UpdatesIterator:
+    """
+    Executes operation and iterates data.
+    Stores all required information to subscribe without repeating.
+    """
+
     subscription: Subscription
     session: gql.client.AsyncClientSession
 
     def iterate(
         self, variable_values: Optional[Dict[str, Any]] = None
     ) -> AsyncIterator[dict]:
+        """
+        Executes operation and iterates data.
+        :param variable_values: dict of variables used in GraphQl
+        subscription operation.
+        :return:
+        """
         return self.session.subscribe(
             self.subscription.method_call.query,
             variable_values=variable_values,
