@@ -7,7 +7,7 @@ This example demonstrates how to use subscription operations.
 import asyncio
 
 from ephyr_control.instance.instance import EphyrInstance
-from ephyr_control.instance.queries import api_subscribe_state
+from ephyr_control.instance.queries import api_subscribe_to_state
 from ephyr_control.instance.subscribe import Subscription
 
 
@@ -16,7 +16,7 @@ async def main():
 
     sub = Subscription(
         instance=instance,  # provides basic connection data
-        method_call=api_subscribe_state,  # define what method to call
+        method_call=api_subscribe_to_state,  # define what method to call
     )
 
     # Subscription object can be used to subscribe multiple times.

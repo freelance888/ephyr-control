@@ -11,17 +11,21 @@ __all__ = (
     "api_change_settings",
     "api_change_state",
     "api_export_all_restreams",
-    "api_subscribe_state",
+    "api_subscribe_to_state",
+    "api_subscribe_to_info",
+    "api_subscribe_to_server_info",
     "mixin_tune_volume",
     "mixin_tune_delay",
     "mixin_tune_sidechain",
+    "mixin_subscribe_to_output",
     "dashboard_add_client",
     "dashboard_remove_client",
+    "dashboard_subscribe_to_statistics",
 )
 
 
-# main API queries
-# ================
+# main API
+# ========
 
 api_get_info = AssignedMethodCall(
     api_path=EphyrApiPaths.API,
@@ -101,7 +105,7 @@ api_export_all_restreams = AssignedMethodCall(
     ),
 )
 
-api_subscribe_state = AssignedMethodCall(
+api_subscribe_to_state = AssignedMethodCall(
     api_path=EphyrApiPaths.API,
     query=gql.gql(
         """
@@ -174,8 +178,44 @@ api_subscribe_state = AssignedMethodCall(
     ),
 )
 
+api_subscribe_to_info = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        subscription Info {
+            info {
+                publicHost
+                title
+                deleteConfirmation
+                enableConfirmation
+                passwordHash
+                passwordOutputHash
+            }
+        }
+        """
+    ),
+)
 
-# output mixin API queries
+api_subscribe_to_server_info = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        subscription ServerInfo {
+            serverInfo {
+                cpuUsage
+                ramTotal
+                ramFree
+                txDelta
+                rxDelta
+                errorMsg
+            }
+        }
+        """
+    ),
+)
+
+
+# output mixin API
 # ================
 
 mixin_tune_volume = AssignedMethodCall(
@@ -243,9 +283,41 @@ mixin_tune_sidechain = AssignedMethodCall(
     ),
 )
 
+mixin_subscribe_to_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.MIXIN,
+    query=gql.gql(
+        """
+        subscription Output($restreamId: RestreamId!, $outputId: OutputId!) {
+            output(outputId: $outputId, restreamId: $restreamId) {
+                id
+                dst
+                label
+                previewUrl
+                volume {
+                    level
+                    muted
+                }
+                mixins {
+                    id
+                    src
+                    volume {
+                        level
+                        muted
+                    }
+                    delay
+                    sidechain
+                }
+                enabled
+                status
+            }
+        }
+        """
+    ),
+)
 
-# Dashboard API queries
-# =====================
+
+# Dashboard API
+# =============
 
 dashboard_add_client = AssignedMethodCall(
     api_path=EphyrApiPaths.DASHBOARD,
@@ -264,6 +336,42 @@ dashboard_remove_client = AssignedMethodCall(
         """
         mutation RemoveClient($client_id: ClientId!) {
             removeClient(clientId: $client_id)
+        }
+        """
+    ),
+)
+
+dashboard_subscribe_to_statistics = AssignedMethodCall(
+    api_path=EphyrApiPaths.DASHBOARD,
+    query=gql.gql(
+        """
+        subscription Statistics {
+            statistics {
+                id
+                statistics {
+                    data {
+                        clientTitle
+                        timestamp
+                        inputs {
+                            status
+                            count
+                        }
+                        outputs {
+                            status
+                            count
+                        }
+                        serverInfo {
+                            cpuUsage
+                            ramTotal
+                            ramFree
+                            txDelta
+                            rxDelta
+                            errorMsg
+                        }
+                    }
+                    errors
+                }
+            }
         }
         """
     ),
