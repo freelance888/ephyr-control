@@ -137,7 +137,6 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
         return pinger.ping()
 
     def build_url(self, dashboard: bool = False) -> yarl.URL:
-        # TODO: add arguments to connect to mixin output
         connection_details = self.get_connection_details()
         if dashboard:
             path = "/dashboard"
