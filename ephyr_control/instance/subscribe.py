@@ -33,6 +33,10 @@ class Subscription:
     Subscription manager for concrete Ephyr instance.
     Does not update already created sessions.
     Operates using websockets.
+
+    :param instance: provides connection options
+    :param method_call: defines GraphQL operation and API (path) to use
+    :param use_ssl: overrides SSL on/off settings provided by EphyrInstance
     """
 
     instance: EphyrInstanceProtocol
@@ -77,6 +81,8 @@ class Subscription:
     def session(self) -> "SubscriptionSession":
         """
         Create SubscriptionSession which is not updated by instance changes.
+        Separate object being created with standalone gql.Client to allow changes
+        made in EphyrInstance to apply to gql.Client.
         :return: session object
         """
         return SubscriptionSession(subscription=self, client=self.build_client())
@@ -87,8 +93,11 @@ class SubscriptionSession:
     """
     Session for subscription operation.
     Does not react to changes in subscription.instance object
-    Acts as context manager - manages connection to server.
+    Acts as async context manager - manages connection to server.
     Returns UpdatesIterator upon entering context.
+
+    This is a separate class from Subscription with standalone gql.Client because
+    it allows changes made in EphyrInstance to apply to gql.Client.
     """
 
     subscription: Subscription

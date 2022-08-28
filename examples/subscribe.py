@@ -11,15 +11,15 @@ from ephyr_control.instance.queries import api_subscribe_state
 from ephyr_control.instance.subscribe import Subscription
 
 
-async def m():
-    i = EphyrInstance(ipv4="142.132.160.160", https=False)
+async def main():
+    instance = EphyrInstance(ipv4="142.132.160.160", https=False)
 
     sub = Subscription(
-        instance=i,  # provides basic connection data
+        instance=instance,  # provides basic connection data
         method_call=api_subscribe_state,  # define what method to call
     )
 
-    # subscription object can be used to subscribe multiple times
+    # Subscription object can be used to subscribe multiple times.
     await asyncio.gather(
         watch(sub),
         watch(sub),
@@ -33,7 +33,9 @@ async def watch(sub):
         # iterate() accepts variables, it provide async iterator
         async for upd in s.iterate():
             print(upd)
+            # Idea: you can use library "deepdiff" to narrow down
+            # which changes are important.
 
 
 if __name__ == "__main__":
-    asyncio.run(m())
+    asyncio.run(main())

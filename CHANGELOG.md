@@ -11,6 +11,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 - Structural dataclasses representing Ephyr's state.
 - Remote control using GraphQL api.
+- Asynchronous subscriptions
 
 ## v0.1.0
 ### Added
