@@ -7,7 +7,7 @@ authors = ["Serhii Khalymon <sergiykhalimon@gmail.com>", "Illia Ananich <illia.a
 [tool.poetry.dependencies]
 python = "^3.8"
 yarl = "^1.8.1"
-gql = {version = "^3.4.0", extras = ["requests"]}
+gql = {version = "^3.4.0", extras = ["requests", "websockets"]}
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.16.0"

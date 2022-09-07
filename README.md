@@ -8,7 +8,9 @@ Client library that allow to control [Ephyr] streaming.
 ## Overview
 **Ephyr Control** is a set of tools to communicate with Ephyr server and manage its state.
 
-It uses GraphQL for communication with Ephyr server. At this point, only synchronous `requests` transport is supported.
+It uses GraphQL for communication with Ephyr server. 
+It supports synchronous `requests` transport for `query` and `mutation` operations, 
+while asynchronous `websockets` transport is used for subscriptions.
 
 ### Example
  

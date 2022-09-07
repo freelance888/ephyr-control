@@ -3,7 +3,7 @@ import dataclasses
 from typing import Protocol, Any, Dict, Optional, ClassVar, Type, Collection
 
 import yarl
-from graphql import DocumentNode as GqlDocument
+from graphql import DocumentNode, OperationType
 
 from ephyr_control.instance.constants import EphyrApiPaths
 
@@ -35,7 +35,16 @@ class EphyrInstanceProtocol(Protocol):
 @dataclasses.dataclass
 class AssignedMethodCall:
     api_path: EphyrApiPaths
-    query: GqlDocument
+    query: DocumentNode
+
+    def __post_init__(self):
+        # allow only 1 definition
+        if len(self.query.definitions) != 1:
+            raise ValueError("Place exactly 1 definition.")
+
+    @property
+    def operation_type(self) -> OperationType:
+        return self.query.definitions[0].operation
 
 
 @dataclasses.dataclass
