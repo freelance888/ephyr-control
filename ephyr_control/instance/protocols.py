@@ -156,7 +156,7 @@ class ClientsCollectionProtocol(Protocol):
 
 
 class RemoteEphyrInstanceProtocol(EphyrInstanceProtocol, Protocol):
-    """EPhyr isntance hosted on server.
+    """Ephyr instance hosted on server.
 
     Implements methods to communicate with Ephyr server."""
 
