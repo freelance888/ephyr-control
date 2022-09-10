@@ -8,7 +8,8 @@ __all__ = (
 )
 
 
-MIXIN_UI_PATH = "/mix"
+MIXIN_UI_PATH: str = "/mix"
+""" Path to web UI used for concrete Output Mixin. """
 
 
 class EphyrPasswordKind(enum.Enum):
@@ -36,4 +37,4 @@ class EphyrApiPaths(enum.Enum):
     DASHBOARD = "/api-dashboard"
 
 
-ALL_API_PATHS = tuple(EphyrApiPaths)
+ALL_API_PATHS: tuple[EphyrApiPaths, ...] = tuple(EphyrApiPaths)
