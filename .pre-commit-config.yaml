@@ -1,0 +1,20 @@
+default_stages: [ commit ]
+
+repos:
+  # using local repos because that way versioning is done by Poetry
+  - repo: local
+    hooks:
+      # https://wemake-python-styleguide.readthedocs.io/en/latest/pages/usage/integrations/plugins.html#hooks
+      - id: flake8
+        name: flake8
+        description: linter
+        entry: flake8
+        args: [ "--config=.flake8" ]
+        language: python
+        types: [ python ]
+      - id: black
+        name: black
+        description: formatter
+        entry: black
+        language: python
+        types: [ python ]

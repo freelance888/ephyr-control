@@ -1,0 +1,33 @@
+
+[flake8]
+count = True
+statistics = True
+show-source = True
+
+max-complexity = 10
+max-line-length = 88
+
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    tests/,
+    examples/,
+
+extend-ignore = E203  # integrates with Black
+ignore =
+    Q000,       # Double quotes found but single quotes preferred :: black formatter
+    W503,       # line break before binary operator :: black formatter
+    WPS305,     # Found `f` string :: allow f-strings
+    WPS306,     # Found class without a base class :: too common for Python3
+    C812,       # missing trailing comma :: gets too annoying sometimes
+    # TODO: resolve these in future
+    I001,I003,I004,I005,     # isort warnings
+    D100,       # Missing docstring in public module
+    D101,       # Missing docstring in public class
+    D102,       # Missing docstring in public method
+    D103,       # Missing docstring in public function
+    D105,       # Missing docstring in magic method
+    F401,F403,
+    WPS300,WPS421,WPS301,WPS410,WPS214,WPS115,WPS412,WPS100,WPS602,WPS231,WPS450,
+    DAR201,DAR101,

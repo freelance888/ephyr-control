@@ -1,4 +1,10 @@
-__version__ = "0.1.0"
+"""Ephyr-control library.
 
-from .config import *
-from .control import *
+Set of tools for managing Ephyr instances.
+"""
+
+__version__ = "1.0.0"
+
+# import instance package only after state is ready
+from .instance import EphyrInstance, RemoteEphyrInstance
+from .state import *
