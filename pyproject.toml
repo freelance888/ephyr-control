@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ephyr-control"
-version = "1.0.0"
+version = "1.0.1"
 description = ""
 authors = ["Serhii Khalymon <sergiykhalimon@gmail.com>", "Illia Ananich <illia.ananich@gmail.com>"]
 

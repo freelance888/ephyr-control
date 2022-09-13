@@ -3,6 +3,11 @@ Ephyr Control changelog
 
 All user visible changes to this project will be documented in this file. This project uses [Semantic Versioning 2.0.0].
 
+## v1.0.1
+### Fixes
+- Bug with websockets connection broking after a few seconds.
+### Changed
+- Shorter imports for users of Subscription API
 
 ## v1.0.0
 ### Removed
