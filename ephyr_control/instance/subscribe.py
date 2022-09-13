@@ -69,13 +69,27 @@ class Subscription:
             path=self.method_call.api_path.value,
         )
 
+    def build_transport(self, url: yarl.URL) -> gql.transport.AsyncTransport:
+        """
+        Build AsyncTransport object.
+        :param url:
+        :return:
+        """
+        return self.Transport(
+            str(url),
+            connect_args={
+                # Ephyr server does not support ping at the moment
+                "ping_interval": None,
+            },
+        )
+
     def build_client(self) -> gql.Client:
         """
         Builds gql Client
         :return: gql.Client
         """
         url = self.build_ws_url()
-        transport = self.Transport(str(url))
+        transport = self.build_transport(url=url)
         return gql.Client(transport=transport)
 
     def session(self) -> "SubscriptionSession":
