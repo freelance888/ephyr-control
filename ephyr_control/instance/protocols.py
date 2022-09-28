@@ -31,6 +31,18 @@ class EphyrInstanceProtocol(Protocol):
     port: int
     password: Optional[str]
 
+    def get_connection_details(self) -> "ServerConnectionDetails":
+        """Create connection details object.
+
+        :return: ServerConnectionDetails
+        """
+        return ServerConnectionDetails(
+            scheme=self.scheme,
+            host=self.host,
+            port=self.port,
+            password=self.password,
+        )
+
 
 @dataclasses.dataclass
 class AssignedMethodCall:
@@ -161,18 +173,6 @@ class RemoteEphyrInstanceProtocol(EphyrInstanceProtocol, Protocol):
     Implements methods to communicate with Ephyr server."""
 
     clients: ClientsCollectionProtocol
-
-    def get_connection_details(self) -> ServerConnectionDetails:
-        """Create connection details object.
-
-        :return: ServerConnectionDetails
-        """
-        return ServerConnectionDetails(
-            scheme=self.scheme,
-            host=self.host,
-            port=self.port,
-            password=self.password,
-        )
 
     @abc.abstractmethod
     def build_url(self) -> yarl.URL:
