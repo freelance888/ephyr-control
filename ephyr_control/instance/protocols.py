@@ -25,11 +25,20 @@ __all__ = (
 
 
 class EphyrInstanceProtocol(Protocol):
-    scheme: str
     ipv4: str
-    host: str
-    port: int
     password: Optional[str]
+
+    @property
+    def host(self) -> str:
+        ...
+
+    @property
+    def port(self) -> int:
+        ...
+
+    @property
+    def scheme(self) -> str:
+        ...
 
 
 @dataclasses.dataclass

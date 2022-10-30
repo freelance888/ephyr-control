@@ -118,7 +118,7 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
         self,
         do_raise: bool = False,
         check_domain: bool = True,
-        loglevel: str = logging.ERROR,
+        loglevel: int = logging.ERROR,
     ) -> bool:
         if check_domain:
             if not self.domain:

@@ -28,7 +28,7 @@ class Pinger:
     do_raise: bool = True
     do_raise_for_status: bool = True
     do_report_error: bool = False
-    loglevel: str = logging.INFO
+    loglevel: int = logging.INFO
 
     target_url: yarl.URL = dataclasses.field(init=False)
     logger: logging.Logger = dataclasses.field(init=False)

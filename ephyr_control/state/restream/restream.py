@@ -1,8 +1,8 @@
 import dataclasses
-import uuid
 from typing import ClassVar, List
 
 from ephyr_control.utils import build_rtmp_uri, generate_random_key_of_length
+from ephyr_control.custom_typing import UUID4
 
 from ..constant import RESTREAM_KEY_MAXLENGTH
 from ._mixins import _KeyedMixin
@@ -74,7 +74,7 @@ class Restream(_KeyedMixin):
 @dataclasses.dataclass
 class UuidRestream(Restream):
     # id field is read-only
-    id: uuid.uuid4 = None
+    id: UUID4 = None
 
 
 @dataclasses.dataclass

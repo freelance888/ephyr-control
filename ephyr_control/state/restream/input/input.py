@@ -1,6 +1,7 @@
 import dataclasses
-import uuid
-from typing import List
+from typing import List, cast
+
+from ephyr_control.custom_typing import UUID4
 
 from ._mixins import _Input
 from .endpoint import Endpoint, rtmp_endpoint_factory
@@ -19,7 +20,7 @@ class Input(_Input):
     KEY_DEFAULT = "origin"
 
     key: str = KEY_DEFAULT
-    src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
+    src: InputSource | None = dataclasses.field(default_factory=lambda: InputSource())
 
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:
@@ -46,14 +47,17 @@ class Input(_Input):
         key_random_chars: int = None,
         endpoints: List[Endpoint] = None,
         enabled: bool = True,
-        src: InputSource or None = None,
+        src: InputSource | None = None,
     ) -> "Input":
-        return super().with_random_key(
-            key_prefix=key_prefix,
-            key_random_chars=key_random_chars,
-            endpoints=endpoints or [rtmp_endpoint_factory()],
-            enabled=enabled,
-            src=src or InputSource(),
+        return cast(
+            Input,
+            super().with_random_key(
+                key_prefix=key_prefix,
+                key_random_chars=key_random_chars,
+                endpoints=endpoints or [rtmp_endpoint_factory()],
+                enabled=enabled,
+                src=src or InputSource(),
+            ),
         )
 
     @classmethod
@@ -70,14 +74,17 @@ class Input(_Input):
                 key_prefixes=input_key_prefixes,
                 key_random_chars=key_random_chars,
             )
-        return cls.with_random_key(
-            key_prefix=key_prefix,
-            key_random_chars=key_random_chars,
-            src=src,
+        return cast(
+            Input,
+            cls.with_random_key(
+                key_prefix=key_prefix,
+                key_random_chars=key_random_chars,
+                src=src,
+            ),
         )
 
 
 @dataclasses.dataclass
 class UuidInput(Input):
     # id field is read-only
-    id: uuid.uuid4 = None
+    id: UUID4 = None

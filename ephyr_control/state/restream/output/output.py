@@ -1,5 +1,6 @@
 import dataclasses
-import uuid
+
+from ephyr_control.custom_typing import UUID4
 
 from .volume import Volume
 
@@ -18,4 +19,4 @@ class Output:
 @dataclasses.dataclass
 class UuidOutput(Output):
     # id field is read-only
-    id: uuid.uuid4 = None
+    id: UUID4 = None
