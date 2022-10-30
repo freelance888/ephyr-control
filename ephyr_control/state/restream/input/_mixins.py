@@ -1,9 +1,9 @@
 import dataclasses
 from typing import List, ClassVar
 
+from ephyr_control.state.restream._mixins import _KeyedMixin
+from ephyr_control.state.constant import INPUT_KEY_MAXLENGTH
 from .endpoint import Endpoint, rtmp_endpoint_factory
-from .._mixins import _KeyedMixin
-from ...constant import INPUT_KEY_MAXLENGTH
 
 __all__ = ("_Input",)
 
