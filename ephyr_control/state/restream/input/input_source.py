@@ -1,7 +1,11 @@
 import dataclasses
 from typing import List
 
-from .failover_input import FailoverInput, backup_input_factory, main_input_factory
+from .failover_input import (
+    FailoverInput,
+    primary_input_factory,
+    backup_input_factory,
+)
 
 __all__ = ("InputSource",)
 
@@ -9,7 +13,7 @@ __all__ = ("InputSource",)
 @dataclasses.dataclass
 class InputSource:
     failover_inputs: List[FailoverInput] = dataclasses.field(
-        default_factory=lambda: [main_input_factory(), backup_input_factory()]
+        default_factory=lambda: [primary_input_factory(), backup_input_factory()]
     )
 
     FI_KEYS_DEFAULT = (FailoverInput.KEY_MAIN, FailoverInput.KEY_BACKUP)
@@ -28,7 +32,7 @@ class InputSource:
             raise KeyError(f'FailoverInput with key="{foinput_key}" not found.')
 
     @property
-    def main_input(self) -> FailoverInput:
+    def primary_input(self) -> FailoverInput:
         return self.failover_inputs[0]
 
     @property

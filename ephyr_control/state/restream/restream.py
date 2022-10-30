@@ -25,8 +25,8 @@ class Restream(_KeyedMixin):
     KEY_MAXLENGTH: ClassVar[int] = RESTREAM_KEY_MAXLENGTH
 
     @property
-    def main_input(self) -> FailoverInput:
-        return self.input.main_input
+    def primary_input(self) -> FailoverInput:
+        return self.input.primary_input
 
     @property
     def backup_input(self) -> FailoverInput:
@@ -60,7 +60,7 @@ class Restream(_KeyedMixin):
         return build_rtmp_uri(
             host=host,
             path=self.path,
-            key=self.main_input.key,
+            key=self.primary_input.key,
         )
 
     def push_to_backup_uri(self, host: str) -> str:

@@ -33,7 +33,7 @@ class Input(_Input):
             ) from exc
 
     @property
-    def main_input(self) -> FailoverInput:
+    def primary_input(self) -> FailoverInput:
         return self.get_failover_input(0)
 
     @property

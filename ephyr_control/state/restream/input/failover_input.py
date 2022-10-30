@@ -16,11 +16,11 @@ __all__ = (
 class FailoverInput(_Input):
     src: PullSource = None
 
-    KEY_MAIN = "main"
-    KEY_BACKUP = "backup"
+    KEY_MAIN = "primary"
+    KEY_BACKUP = "backup1"
 
 
-def main_input_factory(key_random_chars: int = 0) -> FailoverInput:
+def primary_input_factory(key_random_chars: int = 0) -> FailoverInput:
     return cast(
         FailoverInput,
         FailoverInput.with_random_key(
