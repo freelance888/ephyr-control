@@ -20,7 +20,7 @@ class Input(_Input):
     KEY_DEFAULT = "origin"
 
     key: str = KEY_DEFAULT
-    src: InputSource | None = dataclasses.field(default_factory=lambda: InputSource())
+    src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
 
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:
@@ -47,7 +47,7 @@ class Input(_Input):
         key_random_chars: int = None,
         endpoints: List[Endpoint] = None,
         enabled: bool = True,
-        src: InputSource | None = None,
+        src: InputSource or None = None,
     ) -> "Input":
         return cast(
             Input,
