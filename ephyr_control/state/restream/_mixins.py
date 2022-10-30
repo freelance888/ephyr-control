@@ -1,10 +1,7 @@
 import dataclasses
 from typing import ClassVar
 
-from ephyr_control.state.constant import (
-    INPUT_KEY_MAXLENGTH,
-    RESTREAM_KEY_MAXLENGTH,
-)
+from ephyr_control.state.constant import INPUT_KEY_MAXLENGTH, RESTREAM_KEY_MAXLENGTH
 from ephyr_control.utils import generate_random_key_of_length
 
 

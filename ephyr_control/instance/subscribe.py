@@ -6,14 +6,14 @@ See example usage in examples/subscribe.py
 """
 
 import dataclasses
-from typing import Type, ClassVar, Optional, Dict, Any, AsyncIterator
+from typing import Any, AsyncIterator, ClassVar, Dict, Optional, Type
 
 import gql
 import gql.transport
 import graphql
 import yarl
 
-from ephyr_control.instance.protocols import EphyrInstanceProtocol, AssignedMethodCall
+from ephyr_control.instance.protocols import AssignedMethodCall, EphyrInstanceProtocol
 
 try:
     from gql.transport.websockets import WebsocketsTransport

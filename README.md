@@ -8,12 +8,12 @@ Client library that allow to control [Ephyr] streaming.
 ## Overview
 **Ephyr Control** is a set of tools to communicate with Ephyr server and manage its state.
 
-It uses GraphQL for communication with Ephyr server. 
-It supports synchronous `requests` transport for `query` and `mutation` operations, 
+It uses GraphQL for communication with Ephyr server.
+It supports synchronous `requests` transport for `query` and `mutation` operations,
 while asynchronous `websockets` transport is used for subscriptions.
 
 ### Example
- 
+
 See `examples/` folder for code examples.
 
 ## License
@@ -28,4 +28,4 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 
 We strongly support the "Creative Society" project, and it's 8 fundamental values.
 
-[Ephyr]: https://github.com/ALLATRA-IT/ephyr 
+[Ephyr]: https://github.com/ALLATRA-IT/ephyr

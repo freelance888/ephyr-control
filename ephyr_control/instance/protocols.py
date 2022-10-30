@@ -1,6 +1,6 @@
 import abc
 import dataclasses
-from typing import Protocol, Any, Dict, Optional, ClassVar, Type, Collection
+from typing import Any, ClassVar, Collection, Dict, Optional, Protocol, Type
 
 import yarl
 from graphql import DocumentNode, OperationType
@@ -25,11 +25,20 @@ __all__ = (
 
 
 class EphyrInstanceProtocol(Protocol):
-    scheme: str
     ipv4: str
-    host: str
-    port: int
     password: Optional[str]
+
+    @property
+    def host(self) -> str:
+        ...
+
+    @property
+    def port(self) -> int:
+        ...
+
+    @property
+    def scheme(self) -> str:
+        ...
 
 
 @dataclasses.dataclass
