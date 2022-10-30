@@ -9,4 +9,4 @@ class Endpoint:
 
 
 def rtmp_endpoint_factory():
-    Endpoint(kind="rtmp")
+    return Endpoint(kind="rtmp")
