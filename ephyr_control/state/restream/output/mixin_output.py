@@ -1,6 +1,7 @@
 import dataclasses
-import uuid
 from typing import List
+
+from ephyr_control.custom_typing import UUID4
 
 from .output import Output, UuidOutput
 from .volume import Volume
@@ -40,4 +41,4 @@ class OutputWithMixins(Output):
 @dataclasses.dataclass
 class UuidOutputWithMixins(OutputWithMixins, UuidOutput):
     # id field is read-only
-    id: uuid.uuid4 = None
+    id: UUID4 = None

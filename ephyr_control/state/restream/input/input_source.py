@@ -1,11 +1,7 @@
 import dataclasses
 from typing import List
 
-from .failover_input import (
-    FailoverInput,
-    main_input_factory,
-    backup_input_factory,
-)
+from .failover_input import FailoverInput, backup_input_factory, main_input_factory
 
 __all__ = ("InputSource",)
 

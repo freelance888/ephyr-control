@@ -1,9 +1,7 @@
 import gql
 
 from ephyr_control.instance.constants import EphyrApiPaths
-from ephyr_control.instance.protocols import (
-    AssignedMethodCall,
-)
+from ephyr_control.instance.protocols import AssignedMethodCall
 
 __all__ = (
     "api_get_info",
