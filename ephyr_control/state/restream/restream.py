@@ -1,8 +1,8 @@
 import dataclasses
 from typing import ClassVar, List
 
-from ephyr_control.utils import build_rtmp_uri, generate_random_key_of_length
 from ephyr_control.custom_typing import UUID4
+from ephyr_control.utils import build_rtmp_uri, generate_random_key_of_length
 
 from ..constant import RESTREAM_KEY_MAXLENGTH
 from ._mixins import _KeyedMixin
