@@ -1,6 +1,6 @@
 import abc
 import dataclasses
-from typing import Protocol, Any, Dict, Optional, ClassVar, Type, Collection
+from typing import Any, ClassVar, Collection, Dict, Optional, Protocol, Type
 
 import yarl
 from graphql import DocumentNode, OperationType

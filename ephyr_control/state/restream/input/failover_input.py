@@ -2,6 +2,7 @@ import dataclasses
 import uuid
 
 from ephyr_control.state.restream.input.pull_source import PullSource
+
 from ._mixins import _Input
 
 __all__ = (

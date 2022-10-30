@@ -2,37 +2,37 @@ import dataclasses
 import json
 import logging
 import uuid
-from typing import ClassVar, Type, Optional, Dict, Any, Tuple
+from typing import Any, ClassVar, Dict, Optional, Tuple, Type
 
 import gql
 import gql.transport.requests
 import yarl
 
 from ephyr_control.instance.constants import (
-    EphyrApiPaths,
     ALL_API_PATHS,
-    EphyrPasswordKind,
     MIXIN_UI_PATH,
+    EphyrApiPaths,
+    EphyrPasswordKind,
 )
 from ephyr_control.instance.instance import EphyrInstance
 from ephyr_control.instance.protocols import (
+    AssignedClientProtocol,
+    AssignedMethodCall,
+    ClientsCollectionProtocol,
     RemoteEphyrInstanceProtocol,
     ServerConnectionDetails,
-    AssignedClientProtocol,
-    ClientsCollectionProtocol,
-    AssignedMethodCall,
 )
 from ephyr_control.instance.queries import (
+    api_change_password,
     api_change_settings,
     api_change_state,
-    api_change_password,
-    api_get_info,
     api_export_all_restreams,
-    mixin_tune_volume,
-    mixin_tune_delay,
-    mixin_tune_sidechain,
+    api_get_info,
     dashboard_add_client,
     dashboard_remove_client,
+    mixin_tune_delay,
+    mixin_tune_sidechain,
+    mixin_tune_volume,
 )
 from ephyr_control.state.restream.output.volume import Volume
 from ephyr_control.state.settings import Settings

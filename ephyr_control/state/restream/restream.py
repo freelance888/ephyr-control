@@ -3,10 +3,11 @@ import uuid
 from typing import ClassVar, List
 
 from ephyr_control.utils import build_rtmp_uri, generate_random_key_of_length
-from ._mixins import _KeyedMixin
-from .input import Input, FailoverInput
-from .output import Output
+
 from ..constant import RESTREAM_KEY_MAXLENGTH
+from ._mixins import _KeyedMixin
+from .input import FailoverInput, Input
+from .output import Output
 
 __all__ = ("Restream", "UuidRestream", "HostAwareRestream")
 
