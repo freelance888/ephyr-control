@@ -1,7 +1,12 @@
 import dataclasses
 from typing import List
 
-from .failover_input import FailoverInput, backup_input_factory, main_input_factory
+from .failover_input import (
+    FailoverInput,
+    backup1_input_factory,
+    primary_input_factory,
+    backup2_input_factory,
+)
 
 __all__ = ("InputSource",)
 
@@ -9,10 +14,18 @@ __all__ = ("InputSource",)
 @dataclasses.dataclass
 class InputSource:
     failover_inputs: List[FailoverInput] = dataclasses.field(
-        default_factory=lambda: [main_input_factory(), backup_input_factory()]
+        default_factory=lambda: [
+            primary_input_factory(),
+            backup1_input_factory(),
+            backup2_input_factory(),
+        ]
     )
 
-    FI_KEYS_DEFAULT = (FailoverInput.KEY_MAIN, FailoverInput.KEY_BACKUP)
+    FI_KEYS_DEFAULT = (
+        FailoverInput.KEY_PRIMARY,
+        FailoverInput.KEY_BACKUP1,
+        FailoverInput.KEY_BACKUP2,
+    )
 
     def __post_init__(self):
         # ensure unique restream keys
@@ -28,12 +41,16 @@ class InputSource:
             raise KeyError(f'FailoverInput with key="{foinput_key}" not found.')
 
     @property
-    def main_input(self) -> FailoverInput:
+    def primary_input(self) -> FailoverInput:
         return self.failover_inputs[0]
 
     @property
-    def backup_input(self) -> FailoverInput:
+    def backup1_input(self) -> FailoverInput:
         return self.failover_inputs[1]
+
+    @property
+    def backup2_input(self) -> FailoverInput:
+        return self.failover_inputs[2]
 
     @classmethod
     def with_random_keys(

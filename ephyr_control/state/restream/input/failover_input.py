@@ -9,6 +9,9 @@ from ._mixins import _Input
 __all__ = (
     "FailoverInput",
     "UuidFailoverInput",
+    "primary_input_factory",
+    "backup1_input_factory",
+    "backup2_input_factory",
 )
 
 
@@ -16,25 +19,36 @@ __all__ = (
 class FailoverInput(_Input):
     src: PullSource = None
 
-    KEY_MAIN = "main"
-    KEY_BACKUP = "backup"
+    KEY_PRIMARY = "primary"
+    KEY_BACKUP1 = "backup1"
+    KEY_BACKUP2 = "backup2"
 
 
-def main_input_factory(key_random_chars: int = 0) -> FailoverInput:
+def primary_input_factory(key_random_chars: int = 0) -> FailoverInput:
     return cast(
         FailoverInput,
         FailoverInput.with_random_key(
-            key_prefix=FailoverInput.KEY_MAIN,
+            key_prefix=FailoverInput.KEY_PRIMARY,
             key_random_chars=key_random_chars,
         ),
     )
 
 
-def backup_input_factory(key_random_chars: int = 0) -> FailoverInput:
+def backup1_input_factory(key_random_chars: int = 0) -> FailoverInput:
     return cast(
         FailoverInput,
         FailoverInput.with_random_key(
-            key_prefix=FailoverInput.KEY_BACKUP,
+            key_prefix=FailoverInput.KEY_BACKUP1,
+            key_random_chars=key_random_chars,
+        ),
+    )
+
+
+def backup2_input_factory(key_random_chars: int = 0) -> FailoverInput:
+    return cast(
+        FailoverInput,
+        FailoverInput.with_random_key(
+            key_prefix=FailoverInput.KEY_BACKUP2,
             key_random_chars=key_random_chars,
         ),
     )

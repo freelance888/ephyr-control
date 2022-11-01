@@ -33,12 +33,16 @@ class Input(_Input):
             ) from exc
 
     @property
-    def main_input(self) -> FailoverInput:
+    def primary_input(self) -> FailoverInput:
         return self.get_failover_input(0)
 
     @property
-    def backup_input(self) -> FailoverInput:
+    def backup1_input(self) -> FailoverInput:
         return self.get_failover_input(1)
+
+    @property
+    def backup2_input(self) -> FailoverInput:
+        return self.get_failover_input(2)
 
     @classmethod
     def with_random_key(

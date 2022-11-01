@@ -25,12 +25,16 @@ class Restream(_KeyedMixin):
     KEY_MAXLENGTH: ClassVar[int] = RESTREAM_KEY_MAXLENGTH
 
     @property
-    def main_input(self) -> FailoverInput:
-        return self.input.main_input
+    def primary_input(self) -> FailoverInput:
+        return self.input.primary_input
 
     @property
-    def backup_input(self) -> FailoverInput:
-        return self.input.backup_input
+    def backup1_input(self) -> FailoverInput:
+        return self.input.backup1_input
+
+    @property
+    def backup2_input(self) -> FailoverInput:
+        return self.input.backup2_input
 
     @property
     def path(self) -> str:
@@ -56,18 +60,25 @@ class Restream(_KeyedMixin):
                 for failover_input in self.input.src.failover_inputs
             ]
 
-    def push_to_main_uri(self, host: str) -> str:
+    def push_to_primary_uri(self, host: str) -> str:
         return build_rtmp_uri(
             host=host,
             path=self.path,
-            key=self.main_input.key,
+            key=self.primary_input.key,
         )
 
-    def push_to_backup_uri(self, host: str) -> str:
+    def push_to_backup1_uri(self, host: str) -> str:
         return build_rtmp_uri(
             host=host,
             path=self.path,
-            key=self.backup_input.key,
+            key=self.backup1_input.key,
+        )
+
+    def push_to_backup2_uri(self, host: str) -> str:
+        return build_rtmp_uri(
+            host=host,
+            path=self.path,
+            key=self.backup2_input.key,
         )
 
 
@@ -79,7 +90,7 @@ class UuidRestream(Restream):
 
 @dataclasses.dataclass
 class HostAwareRestream(Restream):
-    """This class remembers it's host for easier URI generation,
+    """This class remembers its host for easier URI generation,
     but don't turn it in JSON and paste to Ephyr - convert it back
     to normal Restream first with .make_unaware method."""
 
@@ -91,8 +102,11 @@ class HostAwareRestream(Restream):
     def push_to_uris(self) -> [str, ...]:
         return super().push_to_uris(host=self.host)
 
-    def push_to_main_uri(self) -> str:
-        return super().push_to_main_uri(host=self.host)
+    def push_to_primary_uri(self) -> str:
+        return super().push_to_primary_uri(host=self.host)
 
-    def push_to_backup_uri(self) -> str:
-        return super().push_to_backup_uri(host=self.host)
+    def push_to_backup1_uri(self) -> str:
+        return super().push_to_backup1_uri(host=self.host)
+
+    def push_to_backup2_uri(self) -> str:
+        return super().push_to_backup2_uri(host=self.host)
