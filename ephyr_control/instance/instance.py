@@ -42,10 +42,14 @@ class EphyrInstance(EphyrInstanceProtocol):
     def scheme(self) -> str:
         return "https" if self.https else "http"
 
+    def address(self, with_password=False):
+        if with_password:
+            return f"{self.scheme}://1:{self.password}@{self.host}/"
+        return f"{self.scheme}://{self.host}/"
+
     def print(self):
         """Print data about itself."""
-        host = self.domain if self.domain else self.ipv4
-        address = f"{self.scheme}://{host}/"
         extra = " (" + str(self.ipv4) + ")" if self.domain else ""
-        print(f'Ephyr instance "{self.title}" at {address}{extra}')
+        print(f'Ephyr instance "{self.title}" at {self.address()}{extra}')
+        print(f"Ephyr instance URL with password: {self.address(with_password=True)}")
         print(f"Ephyr suggested password: {self.password}")

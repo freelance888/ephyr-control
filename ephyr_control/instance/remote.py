@@ -147,7 +147,6 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
             user=self.DEFAULT_USER_HTTPAUTH if connection_details.password else None,
             password=connection_details.password,
             host=connection_details.host,
-            port=connection_details.port,
             path=path,
         )
 
