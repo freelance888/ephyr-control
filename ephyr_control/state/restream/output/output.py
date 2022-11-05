@@ -15,8 +15,24 @@ class Output:
     preview_url: str = None
     volume: Volume = dataclasses.field(default_factory=Volume)
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(
+            d["dst"],
+            d.get("label"),
+            d["enabled"],
+            d.get("preview_url"),
+            Volume.from_dict(d["volume"]),
+        )
+
 
 @dataclasses.dataclass
 class UuidOutput(Output):
     # id field is read-only
     id: UUID4 = None
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        output = Output.from_dict(d)
+        output.id = UUID4(d["id"])
+        return output

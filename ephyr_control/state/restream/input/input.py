@@ -22,6 +22,11 @@ class Input(_Input):
     key: str = KEY_DEFAULT
     src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "Input":
+        # TODO: Add more fields
+        return cls(key=d["key"])
+
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:
             raise NoFailoverInput("This Input does not have failover inputs.")

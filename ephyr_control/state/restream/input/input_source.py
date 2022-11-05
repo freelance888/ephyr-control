@@ -4,8 +4,8 @@ from typing import List
 from .failover_input import (
     FailoverInput,
     backup1_input_factory,
-    primary_input_factory,
     backup2_input_factory,
+    primary_input_factory,
 )
 
 __all__ = ("InputSource",)

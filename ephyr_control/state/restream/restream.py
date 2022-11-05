@@ -7,7 +7,7 @@ from ephyr_control.utils import build_rtmp_uri, generate_random_key_of_length
 from ..constant import RESTREAM_KEY_MAXLENGTH
 from ._mixins import _KeyedMixin
 from .input import FailoverInput, Input
-from .output import Output
+from .output import Output, make_output
 
 __all__ = ("Restream", "UuidRestream", "HostAwareRestream")
 
@@ -23,6 +23,15 @@ class Restream(_KeyedMixin):
 
     # Ephyr restrictions
     KEY_MAXLENGTH: ClassVar[int] = RESTREAM_KEY_MAXLENGTH
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(
+            d["key"],
+            d.get("label"),
+            outputs=[make_output(otp) for otp in d["outputs"]],
+            input=Input.from_dict(d["input"]),
+        )
 
     @property
     def primary_input(self) -> FailoverInput:
@@ -86,6 +95,12 @@ class Restream(_KeyedMixin):
 class UuidRestream(Restream):
     # id field is read-only
     id: UUID4 = None
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        restream = Restream.from_dict(d)
+        restream.id = UUID4(d["id"])
+        return restream
 
 
 @dataclasses.dataclass
