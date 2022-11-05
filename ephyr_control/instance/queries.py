@@ -43,6 +43,55 @@ api_get_info = AssignedMethodCall(
     ),
 )
 
+api_set_restream = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation SetRestream(
+            $key: RestreamKey!
+            $url: InputSrcUrl
+            $label: Label
+            $id: RestreamId
+            $backup_inputs: [BackupInput!]
+            $with_hls: Boolean!
+        ) {
+            setRestream(
+                key: $key
+                src: $url
+                label: $label
+                backupInputs: $backup_inputs
+                withHls: $with_hls
+                id: $id
+            )
+        }
+        """
+    ),
+)
+api_set_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation SetOutput(
+            $restream_id: RestreamId!
+            $url: OutputDstUrl!
+            $label: Label
+            $preview_url: Url
+            $mixins: [MixinSrcUrl!]!
+            $id: OutputId
+        ) {
+            setOutput(
+                restreamId: $restream_id
+                dst: $url
+                label: $label
+                previewUrl: $preview_url
+                mixins: $mixins
+                id: $id
+            )
+        }
+        """
+    ),
+)
+
 api_change_password = AssignedMethodCall(
     api_path=EphyrApiPaths.API,
     query=gql.gql(

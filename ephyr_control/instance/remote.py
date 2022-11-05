@@ -2,12 +2,13 @@ import dataclasses
 import json
 import logging
 import uuid
-from typing import Any, ClassVar, Dict, Optional, Tuple, Type
+from typing import Any, ClassVar, Dict, Optional, Tuple, Type, Union
 
 import gql
 import gql.transport.requests
 import yarl
 
+from ephyr_control.custom_typing import UUID4
 from ephyr_control.instance.constants import (
     ALL_API_PATHS,
     MIXIN_UI_PATH,
@@ -28,13 +29,16 @@ from ephyr_control.instance.queries import (
     api_change_state,
     api_export_all_restreams,
     api_get_info,
+    api_set_output,
+    api_set_restream,
     dashboard_add_client,
     dashboard_remove_client,
     mixin_tune_delay,
     mixin_tune_sidechain,
     mixin_tune_volume,
 )
-from ephyr_control.state.restream.output.volume import Volume
+from ephyr_control.state.restream.input import FailoverInput
+from ephyr_control.state.restream.output import Volume
 from ephyr_control.state.settings import Settings
 from ephyr_control.state.state import State
 from ephyr_control.utils.pinger import Pinger
@@ -196,6 +200,89 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         public_host = self.get_info()["publicHost"]
         return public_host == self.ipv4
 
+    def set_resteram(
+        self,
+        key: str,
+        url: Union[str, None] = None,
+        label: Union[str, None] = None,
+        with_hls=False,
+        backup_inputs: [FailoverInput] or None = None,
+        id: Union[UUID4, str, None] = None,
+    ) -> bool:
+        """
+        Add or update Restream input.
+        :param key: string of stream key
+        :param url: optional RTMP or HLS url if pull input needed
+        :param label: optional string of Restream label
+        :param with_hls: boolean value indicates that need stream of HLS
+        :param backup_inputs: optional if addition backup input is required
+        :param id: optional UUID4 id if edit action is happening
+        :return:
+        """
+        variables = {
+            "key": key,
+            "with_hls": with_hls,
+        }
+        if label:
+            variables.update({"label": label})
+        if id:
+            variables.update({"id": str(id)})
+        if url:
+            variables.update({"url": url})
+        # FIXME: need to add proper types here
+        # if backup_inputs:
+        #     variables.update({'backupInputs': backup_inputs})
+        response = self.execute(
+            api_set_restream,
+            variable_values=variables,
+        )
+        success: bool = response["setRestream"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def set_output(
+        self,
+        restream_id: Union[UUID4, str],
+        url: Union[str, None] = None,
+        label: Union[str, None] = None,
+        preview_url: Union[str, None] = None,
+        mixins: [str] or None = None,
+        id: Union[UUID4, str, None] = None,
+    ) -> bool:
+        """
+        Add or update Restream output.
+        :param restream_id: uuid of Restream
+        :param url: optional RTMP or HLS url if pull input needed
+        :param label: optional string of Restream Output label
+        :param preview_url: optional string of Restream Output preview
+        :param mixins: list of mixin urls
+        :param id: optional UUID4 id if edit action is happeing
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "mixins": [],
+        }
+        if label:
+            variables.update({"label": label})
+        if id:
+            variables.update({"id": str(id)})
+        if url:
+            variables.update({"url": url})
+        if preview_url:
+            variables.update({"preview_url": preview_url})
+        if mixins:
+            variables["mixins"].extend(mixins)
+        response = self.execute(
+            api_set_output,
+            variable_values=variables,
+        )
+        success: bool = response["setOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
     def change_password(
         self,
         new_password: str or None,
@@ -294,10 +381,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
 
     def tune_volume(
         self,
-        restream_id: uuid.UUID,
-        output_id: uuid.UUID,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str],
         volume: Volume,
-        mixin_id: Optional[uuid.UUID] = None,
+        mixin_id: Optional[Union[UUID4, str]] = None,
     ) -> bool:
         """
         Set volume options for output's main source or one of it's mixins.
@@ -308,9 +395,9 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: success
         """
         variables = {
-            "restream_id": restream_id.hex,
-            "output_id": output_id.hex,
-            "mixin_id": mixin_id.hex,
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+            "mixin_id": str(mixin_id),
             "level": volume.level,
             "muted": volume.muted,
         }
@@ -319,9 +406,9 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
 
     def tune_delay(
         self,
-        restream_id: uuid.UUID,
-        output_id: uuid.UUID,
-        mixin_id: uuid.UUID,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str],
+        mixin_id: Union[UUID4, str],
         delay_milliseconds: int,
     ) -> bool:
         """
@@ -334,9 +421,9 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: success
         """
         variables = {
-            "restream_id": restream_id.hex,
-            "output_id": output_id.hex,
-            "mixin_id": mixin_id.hex,
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+            "mixin_id": str(mixin_id),
             "delay": delay_milliseconds,
         }
         response = self.execute(mixin_tune_delay, variable_values=variables)
@@ -344,9 +431,9 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
 
     def tune_sidechain(
         self,
-        restream_id: uuid.UUID,
-        output_id: uuid.UUID,
-        mixin_id: uuid.UUID,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str],
+        mixin_id: Union[UUID4, str],
         sidechain_enabled: bool,
     ) -> bool:
         """
@@ -358,9 +445,9 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: success
         """
         variables = {
-            "restream_id": restream_id.hex,
-            "output_id": output_id.hex,
-            "mixin_id": mixin_id.hex,
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+            "mixin_id": str(mixin_id),
             "sidechain": sidechain_enabled,
         }
         response = self.execute(mixin_tune_sidechain, variable_values=variables)

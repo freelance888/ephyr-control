@@ -40,7 +40,7 @@ class EphyrInstance(EphyrInstanceProtocol):
 
     @property
     def scheme(self) -> str:
-        return "https" if self.https else "http"
+        return "https" if self.https and self.domain else "http"
 
     def address(self, with_password=False):
         if with_password:
