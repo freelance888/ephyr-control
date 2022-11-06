@@ -7,7 +7,7 @@ from typing import Optional
 from ephyr_control.instance.protocols import EphyrInstanceProtocol
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(unsafe_hash=True)
 class EphyrInstance(EphyrInstanceProtocol):
     """Ephyr instance - represents one server with its address.
     Connects to server using provided arguments and can perform simple actions on it.

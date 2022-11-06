@@ -184,7 +184,7 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
             return base.with_password(None).with_user(None)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(unsafe_hash=True)
 class RemoteEphyrInstance(BaseRemoteEphyrInstance):
     """Implements concrete actions on Ephyr server."""
 
@@ -397,10 +397,11 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         variables = {
             "restream_id": str(restream_id),
             "output_id": str(output_id),
-            "mixin_id": str(mixin_id),
             "level": volume.level,
             "muted": volume.muted,
         }
+        if mixin_id:
+            variables["mixin_id"] = str(mixin_id)
         response = self.execute(mixin_tune_volume, variable_values=variables)
         return response["tuneVolume"]
 
