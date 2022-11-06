@@ -200,7 +200,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         public_host = self.get_info()["publicHost"]
         return public_host == self.ipv4
 
-    def set_resteram(
+    def set_restream(
         self,
         key: str,
         url: Union[str, None] = None,
