@@ -67,6 +67,17 @@ api_set_restream = AssignedMethodCall(
         """
     ),
 )
+api_remove_restream = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation RemoveRestream($id: RestreamId!) {
+            removeRestream(id: $id)
+        }
+        """
+    ),
+)
+
 api_set_output = AssignedMethodCall(
     api_path=EphyrApiPaths.API,
     query=gql.gql(
@@ -87,6 +98,39 @@ api_set_output = AssignedMethodCall(
                 mixins: $mixins
                 id: $id
             )
+        }
+        """
+    ),
+)
+
+api_remove_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation RemoveOutput($restream_id: RestreamId!, $output_id: OutputId!) {
+            removeOutput(restreamId: $restream_id, id: $output_id)
+        }
+        """
+    ),
+)
+
+api_enable_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation EnableOutput($restream_id: RestreamId!, $output_id: OutputId!) {
+            enableOutput(restreamId: $restream_id, id: $output_id)
+        }
+        """
+    ),
+)
+
+api_disable_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation DisableOutput($restream_id: RestreamId!, $output_id: OutputId!) {
+            disableOutput(restreamId: $restream_id, id: $output_id)
         }
         """
     ),

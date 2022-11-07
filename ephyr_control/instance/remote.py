@@ -27,8 +27,12 @@ from ephyr_control.instance.queries import (
     api_change_password,
     api_change_settings,
     api_change_state,
+    api_disable_output,
+    api_enable_output,
     api_export_all_restreams,
     api_get_info,
+    api_remove_output,
+    api_remove_restream,
     api_set_output,
     api_set_restream,
     dashboard_add_client,
@@ -207,7 +211,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         label: Union[str, None] = None,
         with_hls=False,
         backup_inputs: [FailoverInput] or None = None,
-        id: Union[UUID4, str, None] = None,
+        restream_id: Union[UUID4, str, None] = None,
     ) -> bool:
         """
         Add or update Restream input.
@@ -216,7 +220,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :param label: optional string of Restream label
         :param with_hls: boolean value indicates that need stream of HLS
         :param backup_inputs: optional if addition backup input is required
-        :param id: optional UUID4 id if edit action is happening
+        :param restream_id: optional UUID4 id if edit action is happening
         :return:
         """
         variables = {
@@ -225,8 +229,8 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         }
         if label:
             variables.update({"label": label})
-        if id:
-            variables.update({"id": str(id)})
+        if restream_id:
+            variables.update({"id": str(restream_id)})
         if url:
             variables.update({"url": url})
         # FIXME: need to add proper types here
@@ -248,7 +252,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         label: Union[str, None] = None,
         preview_url: Union[str, None] = None,
         mixins: [str] or None = None,
-        id: Union[UUID4, str, None] = None,
+        output_id: Union[UUID4, str, None] = None,
     ) -> bool:
         """
         Add or update Restream output.
@@ -257,7 +261,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :param label: optional string of Restream Output label
         :param preview_url: optional string of Restream Output preview
         :param mixins: list of mixin urls
-        :param id: optional UUID4 id if edit action is happeing
+        :param output_id: optional UUID4 id if edit action is happeing
         :return:
         """
         variables = {
@@ -266,8 +270,8 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         }
         if label:
             variables.update({"label": label})
-        if id:
-            variables.update({"id": str(id)})
+        if output_id:
+            variables.update({"id": str(output_id)})
         if url:
             variables.update({"url": url})
         if preview_url:
@@ -279,6 +283,99 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             variable_values=variables,
         )
         success: bool = response["setOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def set_enable_output(
+        self,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str, None],
+    ) -> bool:
+        """
+        Enable Restream Output.
+        :param restream_id: UUID4 of Restream
+        :param output_id: UUID4 id of Output
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+        }
+        response = self.execute(
+            api_enable_output,
+            variable_values=variables,
+        )
+        success: bool = response["enableOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def set_disable_output(
+        self,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str, None],
+    ) -> bool:
+        """
+        Disable Restream Output.
+        :param restream_id: UUID4 of Restream
+        :param output_id: UUID4 id of Output
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+        }
+        response = self.execute(
+            api_disable_output,
+            variable_values=variables,
+        )
+        success: bool = response["disableOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def set_remove_output(
+        self,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str, None],
+    ) -> bool:
+        """
+        Remove Restream Output.
+        :param restream_id: UUID4 of Restream
+        :param output_id: UUID4 id of Output
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+        }
+        response = self.execute(
+            api_remove_output,
+            variable_values=variables,
+        )
+        success: bool = response["removeOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def set_remove_restream(
+        self,
+        restream_id: Union[UUID4, str],
+    ) -> bool:
+        """
+        Remove Restream Output.
+        :param restream_id: UUID4 of Restream
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+        }
+        response = self.execute(
+            api_remove_restream,
+            variable_values=variables,
+        )
+        success: bool = response["removeRestream"]
         if success:
             self.rebuild_clients()
         return success
