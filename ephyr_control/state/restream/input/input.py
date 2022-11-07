@@ -2,6 +2,7 @@ import dataclasses
 from typing import List, cast
 
 from ephyr_control.custom_typing import UUID4
+from ephyr_control.state import status
 
 from ._mixins import _Input
 from .endpoint import Endpoint, rtmp_endpoint_factory
@@ -17,15 +18,26 @@ class NoFailoverInput(Exception):
 
 @dataclasses.dataclass
 class Input(_Input):
-    KEY_DEFAULT = "origin"
+    KEY_DEFAULT = "primary"
 
     key: str = KEY_DEFAULT
     src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
+    endpoints: List[Endpoint] = dataclasses.field(default_factory=list)
 
     @classmethod
     def from_dict(cls, d: dict) -> "Input":
         # TODO: Add more fields
-        return cls(key=d["key"])
+        return cls(
+            key=d["key"],
+            endpoints=[Endpoint.from_dict(e) for e in d["endpoints"]],
+        )
+
+    @property
+    def status(self) -> str:
+        rtmp_endpoint = [e for e in self.endpoints if e.kind == "RTMP"]
+        if not rtmp_endpoint:
+            return status.OFFLINE
+        return rtmp_endpoint[0].status
 
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:

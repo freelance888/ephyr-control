@@ -7,7 +7,7 @@ from ephyr_control.utils import build_rtmp_uri, generate_random_key_of_length
 from ..constant import RESTREAM_KEY_MAXLENGTH
 from ._mixins import _KeyedMixin
 from .input import FailoverInput, Input
-from .output import Output, make_output
+from .output import Output, UuidOutput, make_output
 
 __all__ = ("Restream", "UuidRestream", "HostAwareRestream")
 
@@ -93,6 +93,8 @@ class Restream(_KeyedMixin):
 
 @dataclasses.dataclass
 class UuidRestream(Restream):
+    outputs: List[UuidOutput] = dataclasses.field(default_factory=list)
+
     # id field is read-only
     id: UUID4 = None
 
