@@ -287,7 +287,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             self.rebuild_clients()
         return success
 
-    def set_enable_output(
+    def enable_output(
         self,
         restream_id: Union[UUID4, str],
         output_id: Union[UUID4, str, None],
@@ -311,7 +311,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             self.rebuild_clients()
         return success
 
-    def set_disable_output(
+    def disable_output(
         self,
         restream_id: Union[UUID4, str],
         output_id: Union[UUID4, str, None],
@@ -335,7 +335,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             self.rebuild_clients()
         return success
 
-    def set_remove_output(
+    def remove_output(
         self,
         restream_id: Union[UUID4, str],
         output_id: Union[UUID4, str, None],
@@ -359,7 +359,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             self.rebuild_clients()
         return success
 
-    def set_remove_restream(
+    def remove_restream(
         self,
         restream_id: Union[UUID4, str],
     ) -> bool:
@@ -369,7 +369,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return:
         """
         variables = {
-            "restream_id": str(restream_id),
+            "id": str(restream_id),
         }
         response = self.execute(
             api_remove_restream,
