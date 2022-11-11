@@ -416,7 +416,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             api_change_settings,
             variable_values=variables,
         )
-        return response["setSettings"]
+        success = response["setSettings"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def change_state(self, state: State, replace: bool = False) -> bool:
         """
@@ -435,7 +438,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             api_change_state,
             variable_values=variables,
         )
-        return response["import"]
+        success = response["import"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def export(self) -> dict:
         """
@@ -443,6 +449,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: dict with data
         """
         data = self.execute(api_export_all_restreams)
+
         as_string = data["export"]
         return json.loads(as_string)
 
@@ -459,7 +466,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             "client_id": str(instance.build_url()),
         }
         response = self.execute(dashboard_add_client, variable_values=variables)
-        return response["addClient"]
+        success = response["addClient"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def remove_instance_from_dashboard(
         self,
@@ -474,7 +484,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             "client_id": str(instance.build_url()),
         }
         response = self.execute(dashboard_remove_client, variable_values=variables)
-        return response["removeClient"]
+        success = response["removeClient"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def tune_volume(
         self,
@@ -500,7 +513,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         if mixin_id:
             variables["mixin_id"] = str(mixin_id)
         response = self.execute(mixin_tune_volume, variable_values=variables)
-        return response["tuneVolume"]
+        success = response["tuneVolume"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def tune_delay(
         self,
@@ -525,7 +541,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             "delay": delay_milliseconds,
         }
         response = self.execute(mixin_tune_delay, variable_values=variables)
-        return response["tuneDelay"]
+        success = response["tuneDelay"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def tune_sidechain(
         self,
@@ -549,4 +568,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             "sidechain": sidechain_enabled,
         }
         response = self.execute(mixin_tune_sidechain, variable_values=variables)
-        return response["tuneSidechain"]
+        success = response["tuneSidechain"]
+        if success:
+            self.rebuild_clients()
+        return success
