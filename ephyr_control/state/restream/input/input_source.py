@@ -22,9 +22,9 @@ class InputSource:
     )
 
     FI_KEYS_DEFAULT = (
-        FailoverInput.KEY_PRIMARY,
-        FailoverInput.KEY_BACKUP1,
-        FailoverInput.KEY_BACKUP2,
+        (FailoverInput.KEY_PRIMARY, None),
+        (FailoverInput.KEY_BACKUP1, None),
+        (FailoverInput.KEY_BACKUP2, None),
     )
 
     def __post_init__(self):
@@ -55,7 +55,7 @@ class InputSource:
     @classmethod
     def with_random_keys(
         cls,
-        key_prefixes: [str, str] = FI_KEYS_DEFAULT,
+        key_prefixes_with_labels: List[List[str]] = FI_KEYS_DEFAULT,
         key_random_chars: int = FailoverInput.KEY_RANDOM_LENGTH_DEFAULT,
     ) -> "InputSource":
         return cls(
@@ -63,7 +63,8 @@ class InputSource:
                 FailoverInput.with_random_key(
                     key_prefix=key_prefix,
                     key_random_chars=key_random_chars,
+                    endpoint_label=endpoint_label,
                 )
-                for key_prefix in key_prefixes
+                for (key_prefix, endpoint_label) in key_prefixes_with_labels
             ]
         )

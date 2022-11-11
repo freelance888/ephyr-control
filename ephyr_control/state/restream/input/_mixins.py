@@ -1,5 +1,5 @@
 import dataclasses
-from typing import ClassVar, List, cast
+from typing import ClassVar, List, Optional, cast
 
 from ...constant import INPUT_KEY_MAXLENGTH
 from .._mixins import _KeyedMixin
@@ -25,6 +25,7 @@ class _Input(_KeyedMixin):
         key_random_chars: int = None,
         endpoints: List[Endpoint] = None,
         enabled: bool = True,
+        endpoint_label: Optional[str] = None,
         **kwargs,
     ) -> "_Input":
         return cast(
@@ -32,7 +33,7 @@ class _Input(_KeyedMixin):
             super().with_random_key(
                 key_prefix=key_prefix,
                 key_random_chars=key_random_chars,
-                endpoints=endpoints or [rtmp_endpoint_factory()],
+                endpoints=endpoints or [rtmp_endpoint_factory(endpoint_label)],
                 enabled=enabled,
                 **kwargs,
             ),

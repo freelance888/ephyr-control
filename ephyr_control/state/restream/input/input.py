@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List, cast
+from typing import List, Optional, cast
 
 from ephyr_control.custom_typing import UUID4
 from ephyr_control.state import status
@@ -69,13 +69,14 @@ class Input(_Input):
         endpoints: List[Endpoint] = None,
         enabled: bool = True,
         src: InputSource or None = None,
+        endpoint_label: Optional[str] = None,
     ) -> "Input":
         return cast(
             Input,
             super().with_random_key(
                 key_prefix=key_prefix,
                 key_random_chars=key_random_chars,
-                endpoints=endpoints or [rtmp_endpoint_factory()],
+                endpoints=endpoints or [rtmp_endpoint_factory(endpoint_label)],
                 enabled=enabled,
                 src=src or InputSource(),
             ),
@@ -85,14 +86,14 @@ class Input(_Input):
     def with_random_keys(
         cls,
         key_prefix: str = KEY_DEFAULT,
-        input_key_prefixes: [str, str] or None = InputSource.FI_KEYS_DEFAULT,
+        key_prefixes_with_labels: List[List[str]] = InputSource.FI_KEYS_DEFAULT,
         key_random_chars: int = FailoverInput.KEY_RANDOM_LENGTH_DEFAULT,
     ) -> "Input":
-        if input_key_prefixes is None:
+        if key_prefixes_with_labels is None:
             src = None
         else:
             src = InputSource.with_random_keys(
-                key_prefixes=input_key_prefixes,
+                key_prefixes_with_labels=key_prefixes_with_labels,
                 key_random_chars=key_random_chars,
             )
         return cast(
