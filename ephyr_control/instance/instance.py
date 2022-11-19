@@ -5,6 +5,7 @@ __all__ = ("EphyrInstance",)
 from typing import Optional
 
 from ephyr_control.instance.protocols import EphyrInstanceProtocol
+from ephyr_control.types import EphyrConfig
 
 
 @dataclasses.dataclass(unsafe_hash=True)
@@ -25,6 +26,10 @@ class EphyrInstance(EphyrInstanceProtocol):
     title: Optional[str] = None
     password: Optional[str] = None
     https: bool = True
+
+    @classmethod
+    def from_config(cls, config: EphyrConfig):
+        return cls(**config)
 
     @property
     def ip(self) -> str:
