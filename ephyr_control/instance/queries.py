@@ -19,6 +19,12 @@ __all__ = (
     "dashboard_add_client",
     "dashboard_remove_client",
     "dashboard_subscribe_to_statistics",
+    "api_disable_output",
+    "api_enable_output",
+    "api_remove_output",
+    "api_remove_restream",
+    "api_set_output",
+    "api_set_restream",
 )
 
 
