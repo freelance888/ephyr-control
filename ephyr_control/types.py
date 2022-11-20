@@ -1,14 +1,14 @@
-from typing import List, Optional
+from typing import List
 
-from .custom_typing import TypedDict
+from .custom_typing import TypedDict, Required, NotRequired
 
 
 class EphyrConfig(TypedDict):
-    ipv4: str  # unique across all configs
-    domain: Optional[str]
-    title: Optional[str]  # unique across all configs
-    password: Optional[str]
+    ipv4: Required[str]  # unique across all configs
+    domain: NotRequired[str]
+    title: NotRequired[str]  # unique across all configs
+    password: NotRequired[str]
 
 
 class EphyrConfigFull(EphyrConfig):
-    restreams: List[dict]
+    restreams: Required[List[dict]]

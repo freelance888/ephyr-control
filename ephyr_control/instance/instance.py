@@ -28,7 +28,7 @@ class EphyrInstance(EphyrInstanceProtocol):
     https: bool = True
 
     @classmethod
-    def from_config(cls, config: EphyrConfig):
+    def from_config(cls, config: EphyrConfig) -> "EphyrInstance":
         return cls(**config)
 
     @property
