@@ -163,7 +163,7 @@ def to_ephyr_config_from_input(input: Union[Path, str]) -> List[EphyrConfig]:
         # verify that ip address is correct
         ipaddress.ip_address(ipv4)
         return [dict(ipv4=input)]
-    except ValueError as e:
+    except ValueError:
         # it's not IP address or address is incorrect
         ...
 

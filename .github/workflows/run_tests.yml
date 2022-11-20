@@ -1,4 +1,4 @@
-name: Facecast IO API test and release
+name: Ephyr Control tests
 
 on: [push]
 
@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install poetry
-          poetry install
+          poetry install --with dev -E subscriber-cli
       - name: Test with pytest
         run: |
-          poetry run pytest -E subscriber-cli
+          poetry run pytest

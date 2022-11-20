@@ -1,6 +1,6 @@
 from typing import List
 
-from .custom_typing import TypedDict, Required, NotRequired
+from .custom_typing import NotRequired, Required, TypedDict
 
 
 class EphyrConfig(TypedDict):

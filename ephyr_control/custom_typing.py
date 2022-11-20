@@ -3,11 +3,7 @@ import typing
 import uuid
 
 if sys.version_info >= (3, 8):
-    from typing import (  # noqa
-        Literal,
-        TypedDict,
-        overload,
-    )
+    from typing import Literal, TypedDict, overload  # noqa
 else:
     from typing_extensions import (  # noqa
         Literal,
@@ -17,10 +13,7 @@ else:
         overload,
     )
 
-from typing_extensions import (  # noqa
-    NotRequired,
-    Required,
-)
+from typing_extensions import NotRequired, Required  # noqa
 
 UUID4 = uuid.UUID  # uuid.uuid4
 IPv4 = typing.NewType("IPv4", str)
