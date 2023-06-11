@@ -39,7 +39,7 @@ from ephyr_control.instance.queries import (
     dashboard_remove_client,
     mixin_tune_delay,
     mixin_tune_sidechain,
-    mixin_tune_volume,
+    mixin_tune_volume, api_fetch_playlist_from_gdrive, api_play_file_from_playlist, api_stop_playing_file_from_playlist,
 )
 from ephyr_control.state.restream.input import FailoverInput
 from ephyr_control.state.restream.output import Volume
@@ -569,6 +569,78 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         }
         response = self.execute(mixin_tune_sidechain, variable_values=variables)
         success = response["tuneSidechain"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def fetch_playlist_from_gdrive(
+        self,
+        restream_id: Union[UUID4, str],
+        folder_id:  str,
+    ) -> bool:
+        """
+        Sends request to Google API and appends found files to the provided restream's playlist.
+        :param restream_id: UUID4 of Restream
+        :param folder_id: Google folder id with videos
+        :return:
+        """
+        variables = {
+            "id": str(restream_id),
+            "folder_id": folder_id
+        }
+
+        response = self.execute(
+            api_fetch_playlist_from_gdrive,
+            variable_values=variables,
+        )
+        success: bool = response["getPlaylistFromGdrive"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def play_file_from_playlist(
+        self,
+        restream_id: Union[UUID4, str],
+        file_id: Union[UUID4, str],
+    ) -> bool:
+        """
+        Sends request to Google API and appends found files to the provided restream's playlist.
+        :param restream_id: UUID4 of Restream
+        :param file_id: Google folder file id with videos
+        :return:
+        """
+        variables = {
+            "restreamId": str(restream_id),
+            "file_id": str(file_id)
+        }
+
+        response = self.execute(
+            api_play_file_from_playlist,
+            variable_values=variables,
+        )
+        success: bool = response["playFileFromPlaylist"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def stop_file_from_playlist(
+        self,
+        restream_id: Union[UUID4, str],
+    ) -> bool:
+        """
+        Sends request to Google API and appends found files to the provided restream's playlist.
+        :param restream_id: UUID4 of Restream
+        :return:
+        """
+        variables = {
+            "restreamId": str(restream_id),
+        }
+
+        response = self.execute(
+            api_stop_playing_file_from_playlist,
+            variable_values=variables,
+        )
+        success: bool = response["stopPlayingFileFromPlaylist"]
         if success:
             self.rebuild_clients()
         return success
