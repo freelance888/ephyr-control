@@ -270,7 +270,20 @@ api_subscribe_to_state = AssignedMethodCall(
                     status
                 }
             }
+            playlist {
+                currentlyPlayingFile {
+                    fileId
+                    name
+                    wasPlayed
+                }
+                queue {
+                    fileId
+                    name
+                    wasPlayed
+                }
+            }
         }
+
         """
     ),
 )
@@ -469,6 +482,54 @@ dashboard_subscribe_to_statistics = AssignedMethodCall(
                     errors
                 }
             }
+        }
+        """
+    ),
+)
+
+################################
+# File and Playlist management #
+################################
+
+api_fetch_playlist_from_gdrive = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation GetPlaylistFromGdrive($id: RestreamId!, $folder_id: String!) {
+            getPlaylistFromGdrive(restreamId: $id, folderId: $folder_id)
+        }
+        """
+    ),
+)
+
+api_restart_playlist_download = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation RestartPlaylistDownload($id: RestreamId!) {
+            restartPlaylistDownload(restreamId: $id)
+        }
+        """
+    ),
+)
+
+api_play_file_from_playlist = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation PlayFileFromPlaylist($restreamId: RestreamId!, $file_id: FileId!) {
+            playFileFromPlaylist(restreamId: $restreamId, fileId: $file_id)
+        }
+        """
+    ),
+)
+
+api_stop_playing_file_from_playlist = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation StopPlayingFileFromPlaylist($restreamId: RestreamId!) {
+            stopPlayingFileFromPlaylist(restreamId: $restreamId)
         }
         """
     ),
