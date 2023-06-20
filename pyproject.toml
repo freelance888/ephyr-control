@@ -31,7 +31,7 @@ subscriber-cli = ["deepdiff", "aiofiles", "orjson"]
 ephyr_subscriber = { callable="ephyr_control.subscriber:run_cli", extras = ["subscriber-cli"] }
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["setuptools>=40.8.0", "wheel", "poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.black]
