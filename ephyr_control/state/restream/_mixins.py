@@ -21,7 +21,7 @@ class _KeyedMixin:
 
     # Constants of this implementation
     KEY_SEP: ClassVar[str] = "_"
-    KEY_RANDOM_LENGTH_DEFAULT: ClassVar[int] = 8
+    KEY_RANDOM_LENGTH_DEFAULT: ClassVar[int] = 6
 
     def __post_init__(self):
         if len(self.key) > self.KEY_MAXLENGTH:

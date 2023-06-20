@@ -16,12 +16,16 @@ class EnhancedJSONEncoder(json.JSONEncoder):
     """
 
     def default(self, o):  # noqa: WPS111
+        from ephyr_control.instance.constants import EphyrApiPaths
+
         if dataclasses.is_dataclass(o):
             return dataclasses.asdict(o)
         elif isinstance(o, yarl.URL):
             return {"yarl.URL": f"yarl.URL('{o}')"}
         elif isinstance(o, gql.Client):
             return {"gql.Client": None}
+        elif isinstance(o, EphyrApiPaths):
+            return o.value
         return super().default(o)
 
 

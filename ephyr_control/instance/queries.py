@@ -19,6 +19,12 @@ __all__ = (
     "dashboard_add_client",
     "dashboard_remove_client",
     "dashboard_subscribe_to_statistics",
+    "api_disable_output",
+    "api_enable_output",
+    "api_remove_output",
+    "api_remove_restream",
+    "api_set_output",
+    "api_set_restream",
 )
 
 
@@ -40,6 +46,99 @@ api_get_info = AssignedMethodCall(
             }
         }
     """
+    ),
+)
+
+api_set_restream = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation SetRestream(
+            $key: RestreamKey!
+            $url: InputSrcUrl
+            $label: Label
+            $id: RestreamId
+            $backup_inputs: [BackupInput!]
+            $with_hls: Boolean!
+        ) {
+            setRestream(
+                key: $key
+                src: $url
+                label: $label
+                backupInputs: $backup_inputs
+                withHls: $with_hls
+                id: $id
+            )
+        }
+        """
+    ),
+)
+api_remove_restream = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation RemoveRestream($id: RestreamId!) {
+            removeRestream(id: $id)
+        }
+        """
+    ),
+)
+
+api_set_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation SetOutput(
+            $restream_id: RestreamId!
+            $url: OutputDstUrl!
+            $label: Label
+            $preview_url: Url
+            $mixins: [MixinSrcUrl!]!
+            $id: OutputId
+        ) {
+            setOutput(
+                restreamId: $restream_id
+                dst: $url
+                label: $label
+                previewUrl: $preview_url
+                mixins: $mixins
+                id: $id
+            )
+        }
+        """
+    ),
+)
+
+api_remove_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation RemoveOutput($restream_id: RestreamId!, $output_id: OutputId!) {
+            removeOutput(restreamId: $restream_id, id: $output_id)
+        }
+        """
+    ),
+)
+
+api_enable_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation EnableOutput($restream_id: RestreamId!, $output_id: OutputId!) {
+            enableOutput(restreamId: $restream_id, id: $output_id)
+        }
+        """
+    ),
+)
+
+api_disable_output = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation DisableOutput($restream_id: RestreamId!, $output_id: OutputId!) {
+            disableOutput(restreamId: $restream_id, id: $output_id)
+        }
+        """
     ),
 )
 
@@ -171,7 +270,20 @@ api_subscribe_to_state = AssignedMethodCall(
                     status
                 }
             }
+            playlist {
+                currentlyPlayingFile {
+                    fileId
+                    name
+                    wasPlayed
+                }
+                queue {
+                    fileId
+                    name
+                    wasPlayed
+                }
+            }
         }
+
         """
     ),
 )
@@ -370,6 +482,54 @@ dashboard_subscribe_to_statistics = AssignedMethodCall(
                     errors
                 }
             }
+        }
+        """
+    ),
+)
+
+################################
+# File and Playlist management #
+################################
+
+api_fetch_playlist_from_gdrive = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation GetPlaylistFromGdrive($id: RestreamId!, $folder_id: String!) {
+            getPlaylistFromGdrive(restreamId: $id, folderId: $folder_id)
+        }
+        """
+    ),
+)
+
+api_restart_playlist_download = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation RestartPlaylistDownload($id: RestreamId!) {
+            restartPlaylistDownload(restreamId: $id)
+        }
+        """
+    ),
+)
+
+api_play_file_from_playlist = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation PlayFileFromPlaylist($restreamId: RestreamId!, $file_id: FileId!) {
+            playFileFromPlaylist(restreamId: $restreamId, fileId: $file_id)
+        }
+        """
+    ),
+)
+
+api_stop_playing_file_from_playlist = AssignedMethodCall(
+    api_path=EphyrApiPaths.API,
+    query=gql.gql(
+        """
+        mutation StopPlayingFileFromPlaylist($restreamId: RestreamId!) {
+            stopPlayingFileFromPlaylist(restreamId: $restreamId)
         }
         """
     ),

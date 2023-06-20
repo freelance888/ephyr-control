@@ -1,4 +1,5 @@
 import enum
+from typing import Tuple
 
 __all__ = (
     "MIXIN_UI_PATH",
@@ -37,4 +38,4 @@ class EphyrApiPaths(enum.Enum):
     DASHBOARD = "/api-dashboard"
 
 
-ALL_API_PATHS: tuple[EphyrApiPaths, ...] = tuple(EphyrApiPaths)
+ALL_API_PATHS: Tuple[EphyrApiPaths, ...] = tuple(EphyrApiPaths)

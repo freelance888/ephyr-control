@@ -3,6 +3,14 @@ Ephyr Control changelog
 
 All user visible changes to this project will be documented in this file. This project uses [Semantic Versioning 2.0.0].
 
+## v1.1.0
+### Added
+- Labels to Restream
+- Second `backup2` input
+- `removeRestream`, `removeOutput`, `enableOutput`, `disableOutput` mutations
+- Script to subscriber tu multiple Ephyr's
+
+
 ## v1.0.1
 ### Fixes
 - Bug with websockets connection broking after a few seconds.

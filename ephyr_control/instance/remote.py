@@ -2,12 +2,13 @@ import dataclasses
 import json
 import logging
 import uuid
-from typing import Any, ClassVar, Dict, Optional, Tuple, Type
+from typing import Any, ClassVar, Dict, Optional, Tuple, Type, Union
 
 import gql
 import gql.transport.requests
 import yarl
 
+from ephyr_control.custom_typing import UUID4
 from ephyr_control.instance.constants import (
     ALL_API_PATHS,
     MIXIN_UI_PATH,
@@ -26,15 +27,25 @@ from ephyr_control.instance.queries import (
     api_change_password,
     api_change_settings,
     api_change_state,
+    api_disable_output,
+    api_enable_output,
     api_export_all_restreams,
+    api_fetch_playlist_from_gdrive,
     api_get_info,
+    api_play_file_from_playlist,
+    api_remove_output,
+    api_remove_restream,
+    api_set_output,
+    api_set_restream,
+    api_stop_playing_file_from_playlist,
     dashboard_add_client,
     dashboard_remove_client,
     mixin_tune_delay,
     mixin_tune_sidechain,
     mixin_tune_volume,
 )
-from ephyr_control.state.restream.output.volume import Volume
+from ephyr_control.state.restream.input import FailoverInput
+from ephyr_control.state.restream.output import Volume
 from ephyr_control.state.settings import Settings
 from ephyr_control.state.state import State
 from ephyr_control.utils.pinger import Pinger
@@ -147,7 +158,6 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
             user=self.DEFAULT_USER_HTTPAUTH if connection_details.password else None,
             password=connection_details.password,
             host=connection_details.host,
-            port=connection_details.port,
             path=path,
         )
 
@@ -181,7 +191,7 @@ class BaseRemoteEphyrInstance(EphyrInstance, RemoteEphyrInstanceProtocol):
             return base.with_password(None).with_user(None)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(unsafe_hash=True)
 class RemoteEphyrInstance(BaseRemoteEphyrInstance):
     """Implements concrete actions on Ephyr server."""
 
@@ -196,6 +206,182 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
     def verify_ipv4_domain_match(self) -> bool:
         public_host = self.get_info()["publicHost"]
         return public_host == self.ipv4
+
+    def set_restream(
+        self,
+        key: str,
+        url: Union[str, None] = None,
+        label: Union[str, None] = None,
+        with_hls=False,
+        backup_inputs: [FailoverInput] or None = None,
+        restream_id: Union[UUID4, str, None] = None,
+    ) -> bool:
+        """
+        Add or update Restream input.
+        :param key: string of stream key
+        :param url: optional RTMP or HLS url if pull input needed
+        :param label: optional string of Restream label
+        :param with_hls: boolean value indicates that need stream of HLS
+        :param backup_inputs: optional if addition backup input is required
+        :param restream_id: optional UUID4 id if edit action is happening
+        :return:
+        """
+        variables = {
+            "key": key,
+            "with_hls": with_hls,
+        }
+        if label:
+            variables.update({"label": label})
+        if restream_id:
+            variables.update({"id": str(restream_id)})
+        if url:
+            variables.update({"url": url})
+        # FIXME: need to add proper types here
+        # if backup_inputs:
+        #     variables.update({'backupInputs': backup_inputs})
+        response = self.execute(
+            api_set_restream,
+            variable_values=variables,
+        )
+        success: bool = response["setRestream"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def set_output(
+        self,
+        restream_id: Union[UUID4, str],
+        url: Union[str, None] = None,
+        label: Union[str, None] = None,
+        preview_url: Union[str, None] = None,
+        mixins: [str] or None = None,
+        output_id: Union[UUID4, str, None] = None,
+    ) -> bool:
+        """
+        Add or update Restream output.
+        :param restream_id: uuid of Restream
+        :param url: optional RTMP or HLS url if pull input needed
+        :param label: optional string of Restream Output label
+        :param preview_url: optional string of Restream Output preview
+        :param mixins: list of mixin urls
+        :param output_id: optional UUID4 id if edit action is happeing
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "mixins": [],
+        }
+        if label:
+            variables.update({"label": label})
+        if output_id:
+            variables.update({"id": str(output_id)})
+        if url:
+            variables.update({"url": url})
+        if preview_url:
+            variables.update({"preview_url": preview_url})
+        if mixins:
+            variables["mixins"].extend(mixins)
+        response = self.execute(
+            api_set_output,
+            variable_values=variables,
+        )
+        success: bool = response["setOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def enable_output(
+        self,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str, None],
+    ) -> bool:
+        """
+        Enable Restream Output.
+        :param restream_id: UUID4 of Restream
+        :param output_id: UUID4 id of Output
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+        }
+        response = self.execute(
+            api_enable_output,
+            variable_values=variables,
+        )
+        success: bool = response["enableOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def disable_output(
+        self,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str, None],
+    ) -> bool:
+        """
+        Disable Restream Output.
+        :param restream_id: UUID4 of Restream
+        :param output_id: UUID4 id of Output
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+        }
+        response = self.execute(
+            api_disable_output,
+            variable_values=variables,
+        )
+        success: bool = response["disableOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def remove_output(
+        self,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str, None],
+    ) -> bool:
+        """
+        Remove Restream Output.
+        :param restream_id: UUID4 of Restream
+        :param output_id: UUID4 id of Output
+        :return:
+        """
+        variables = {
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+        }
+        response = self.execute(
+            api_remove_output,
+            variable_values=variables,
+        )
+        success: bool = response["removeOutput"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def remove_restream(
+        self,
+        restream_id: Union[UUID4, str],
+    ) -> bool:
+        """
+        Remove Restream Output.
+        :param restream_id: UUID4 of Restream
+        :return:
+        """
+        variables = {
+            "id": str(restream_id),
+        }
+        response = self.execute(
+            api_remove_restream,
+            variable_values=variables,
+        )
+        success: bool = response["removeRestream"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def change_password(
         self,
@@ -233,7 +419,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             api_change_settings,
             variable_values=variables,
         )
-        return response["setSettings"]
+        success = response["setSettings"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def change_state(self, state: State, replace: bool = False) -> bool:
         """
@@ -252,7 +441,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             api_change_state,
             variable_values=variables,
         )
-        return response["import"]
+        success = response["import"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def export(self) -> dict:
         """
@@ -260,6 +452,7 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: dict with data
         """
         data = self.execute(api_export_all_restreams)
+
         as_string = data["export"]
         return json.loads(as_string)
 
@@ -276,7 +469,10 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             "client_id": str(instance.build_url()),
         }
         response = self.execute(dashboard_add_client, variable_values=variables)
-        return response["addClient"]
+        success = response["addClient"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def remove_instance_from_dashboard(
         self,
@@ -291,14 +487,17 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
             "client_id": str(instance.build_url()),
         }
         response = self.execute(dashboard_remove_client, variable_values=variables)
-        return response["removeClient"]
+        success = response["removeClient"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def tune_volume(
         self,
-        restream_id: uuid.UUID,
-        output_id: uuid.UUID,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str],
         volume: Volume,
-        mixin_id: Optional[uuid.UUID] = None,
+        mixin_id: Optional[Union[UUID4, str]] = None,
     ) -> bool:
         """
         Set volume options for output's main source or one of it's mixins.
@@ -309,20 +508,24 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: success
         """
         variables = {
-            "restream_id": restream_id.hex,
-            "output_id": output_id.hex,
-            "mixin_id": mixin_id.hex,
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
             "level": volume.level,
             "muted": volume.muted,
         }
+        if mixin_id:
+            variables["mixin_id"] = str(mixin_id)
         response = self.execute(mixin_tune_volume, variable_values=variables)
-        return response["tuneVolume"]
+        success = response["tuneVolume"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def tune_delay(
         self,
-        restream_id: uuid.UUID,
-        output_id: uuid.UUID,
-        mixin_id: uuid.UUID,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str],
+        mixin_id: Union[UUID4, str],
         delay_milliseconds: int,
     ) -> bool:
         """
@@ -335,19 +538,22 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: success
         """
         variables = {
-            "restream_id": restream_id.hex,
-            "output_id": output_id.hex,
-            "mixin_id": mixin_id.hex,
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+            "mixin_id": str(mixin_id),
             "delay": delay_milliseconds,
         }
         response = self.execute(mixin_tune_delay, variable_values=variables)
-        return response["tuneDelay"]
+        success = response["tuneDelay"]
+        if success:
+            self.rebuild_clients()
+        return success
 
     def tune_sidechain(
         self,
-        restream_id: uuid.UUID,
-        output_id: uuid.UUID,
-        mixin_id: uuid.UUID,
+        restream_id: Union[UUID4, str],
+        output_id: Union[UUID4, str],
+        mixin_id: Union[UUID4, str],
         sidechain_enabled: bool,
     ) -> bool:
         """
@@ -359,10 +565,82 @@ class RemoteEphyrInstance(BaseRemoteEphyrInstance):
         :return: success
         """
         variables = {
-            "restream_id": restream_id.hex,
-            "output_id": output_id.hex,
-            "mixin_id": mixin_id.hex,
+            "restream_id": str(restream_id),
+            "output_id": str(output_id),
+            "mixin_id": str(mixin_id),
             "sidechain": sidechain_enabled,
         }
         response = self.execute(mixin_tune_sidechain, variable_values=variables)
-        return response["tuneSidechain"]
+        success = response["tuneSidechain"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def fetch_playlist_from_gdrive(
+        self,
+        restream_id: Union[UUID4, str],
+        folder_id: str,
+    ) -> bool:
+        """
+        Sends request to Google API and appends found files to
+            the provided restream's playlist.
+        :param restream_id: UUID4 of Restream
+        :param folder_id: Google folder id with videos
+        :return:
+        """
+        variables = {"id": str(restream_id), "folder_id": folder_id}
+
+        response = self.execute(
+            api_fetch_playlist_from_gdrive,
+            variable_values=variables,
+        )
+        success: bool = response["getPlaylistFromGdrive"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def play_file_from_playlist(
+        self,
+        restream_id: Union[UUID4, str],
+        file_id: Union[UUID4, str],
+    ) -> bool:
+        """
+        Sends request to Google API and play selected file of
+            provided restream's playlist.
+        :param restream_id: UUID4 of Restream
+        :param file_id: Google folder file id with videos
+        :return:
+        """
+        variables = {"restreamId": str(restream_id), "file_id": str(file_id)}
+
+        response = self.execute(
+            api_play_file_from_playlist,
+            variable_values=variables,
+        )
+        success: bool = response["playFileFromPlaylist"]
+        if success:
+            self.rebuild_clients()
+        return success
+
+    def stop_file_from_playlist(
+        self,
+        restream_id: Union[UUID4, str],
+    ) -> bool:
+        """
+        Sends request to Google API and stops playing from
+            the provided restream's playlist.
+        :param restream_id: UUID4 of Restream
+        :return:
+        """
+        variables = {
+            "restreamId": str(restream_id),
+        }
+
+        response = self.execute(
+            api_stop_playing_file_from_playlist,
+            variable_values=variables,
+        )
+        success: bool = response["stopPlayingFileFromPlaylist"]
+        if success:
+            self.rebuild_clients()
+        return success

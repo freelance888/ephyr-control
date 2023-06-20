@@ -1,10 +1,6 @@
 name: pre-commit
 
-on:
-    pull_request:
-        branches-ignore: ['dependabot/**']
-    push:
-        branches: [master, develop]
+on: [push]
 
 jobs:
     pre-commit:
@@ -15,5 +11,6 @@ jobs:
             - run: |
                   pip install -U pip
                   pip install poetry
-                  poetry install
+                  poetry config virtualenvs.create false --local
+                  poetry install --with dev
             - uses: pre-commit/action@v2.0.0

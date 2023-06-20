@@ -1,6 +1,6 @@
 import abc
 import dataclasses
-from typing import Any, ClassVar, Collection, Dict, Optional, Protocol, Type
+from typing import Any, ClassVar, Collection, Dict, Optional, Type
 
 import yarl
 from graphql import DocumentNode, OperationType
@@ -24,7 +24,7 @@ __all__ = (
 )
 
 
-class EphyrInstanceProtocol(Protocol):
+class EphyrInstanceProtocol(abc.ABC):
     ipv4: str
     password: Optional[str]
 
@@ -39,6 +39,18 @@ class EphyrInstanceProtocol(Protocol):
     @property
     def scheme(self) -> str:
         ...
+
+    def get_connection_details(self) -> "ServerConnectionDetails":
+        """Create connection details object.
+
+        :return: ServerConnectionDetails
+        """
+        return ServerConnectionDetails(
+            scheme=self.scheme,
+            host=self.host,
+            port=self.port,
+            password=self.password,
+        )
 
 
 @dataclasses.dataclass
@@ -68,7 +80,7 @@ class ClientNotInitialisedError(Exception):
     """Raised when Client was not yet initialised."""
 
 
-class AssignedClientProtocol(Protocol):
+class AssignedClientProtocol(abc.ABC):
     """Client assigned to API path - protocol."""
 
     api_path: EphyrApiPaths
@@ -118,7 +130,7 @@ class AssignedClientProtocol(Protocol):
         """
 
 
-class ClientsCollectionProtocol(Protocol):
+class ClientsCollectionProtocol(abc.ABC):
     """Collection of clients - protocol.
 
     Work with multiple clients at once,
@@ -164,24 +176,12 @@ class ClientsCollectionProtocol(Protocol):
         )
 
 
-class RemoteEphyrInstanceProtocol(EphyrInstanceProtocol, Protocol):
+class RemoteEphyrInstanceProtocol(EphyrInstanceProtocol, abc.ABC):
     """Ephyr instance hosted on server.
 
     Implements methods to communicate with Ephyr server."""
 
     clients: ClientsCollectionProtocol
-
-    def get_connection_details(self) -> ServerConnectionDetails:
-        """Create connection details object.
-
-        :return: ServerConnectionDetails
-        """
-        return ServerConnectionDetails(
-            scheme=self.scheme,
-            host=self.host,
-            port=self.port,
-            password=self.password,
-        )
 
     @abc.abstractmethod
     def build_url(self) -> yarl.URL:

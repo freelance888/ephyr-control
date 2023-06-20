@@ -15,7 +15,7 @@ class Mixin:
 
     Note: this class is no a "mixin" by the standard meaning of this word
     in Python OOP.
-    It only referes to an entity in Ephyr state structure that mixes
+    It only refers to an entity in Ephyr state structure that mixes
     video and audio.
     """
 
@@ -26,19 +26,44 @@ class Mixin:
 
     @classmethod
     def from_dict(cls, d: dict) -> "Mixin":
-        if "volume" in d:
-            volume = Volume(**d.pop("volume"))
-        else:
-            volume = None
-        return cls(**d, volume=volume)
+        return cls(
+            src=d["src"],
+            volume=Volume.from_dict(d["volume"]),
+            delay=d["delay"],
+            sidechain=d["sidechain"],
+        )
+
+
+class UuidMixin(Mixin):
+    # id field is read-only
+    id: UUID4 = None
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Mixin":
+        mixin = Mixin.from_dict(d)
+        mixin.id = UUID4(d["id"])
+        return mixin
 
 
 @dataclasses.dataclass
 class OutputWithMixins(Output):
     mixins: List[Mixin] = dataclasses.field(default_factory=list)
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "OutputWithMixins":
+        output = Output.from_dict(d)
+        output.mixins = [Mixin.from_dict(m) for m in d["mixins"]]
+        return output
+
 
 @dataclasses.dataclass
 class UuidOutputWithMixins(OutputWithMixins, UuidOutput):
     # id field is read-only
     id: UUID4 = None
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "OutputWithMixins":
+        output = Output.from_dict(d)
+        output.mixins = [UuidMixin.from_dict(m) for m in d["mixins"]]
+        output.id = UUID4(d["id"])
+        return output

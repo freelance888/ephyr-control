@@ -1,7 +1,8 @@
 import dataclasses
-from typing import List, cast
+from typing import List, Optional, cast
 
 from ephyr_control.custom_typing import UUID4
+from ephyr_control.state import status
 
 from ._mixins import _Input
 from .endpoint import Endpoint, rtmp_endpoint_factory
@@ -17,10 +18,26 @@ class NoFailoverInput(Exception):
 
 @dataclasses.dataclass
 class Input(_Input):
-    KEY_DEFAULT = "origin"
+    KEY_DEFAULT = "primary"
 
     key: str = KEY_DEFAULT
     src: InputSource or None = dataclasses.field(default_factory=lambda: InputSource())
+    endpoints: List[Endpoint] = dataclasses.field(default_factory=list)
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "Input":
+        # TODO: Add more fields
+        return cls(
+            key=d["key"],
+            endpoints=[Endpoint.from_dict(e) for e in d["endpoints"]],
+        )
+
+    @property
+    def status(self) -> str:
+        rtmp_endpoint = [e for e in self.endpoints if e.kind == "RTMP"]
+        if not rtmp_endpoint:
+            return status.OFFLINE
+        return rtmp_endpoint[0].status
 
     def get_failover_input(self, idx: int) -> FailoverInput:
         if not self.src:
@@ -33,12 +50,16 @@ class Input(_Input):
             ) from exc
 
     @property
-    def main_input(self) -> FailoverInput:
+    def primary_input(self) -> FailoverInput:
         return self.get_failover_input(0)
 
     @property
-    def backup_input(self) -> FailoverInput:
+    def backup1_input(self) -> FailoverInput:
         return self.get_failover_input(1)
+
+    @property
+    def backup2_input(self) -> FailoverInput:
+        return self.get_failover_input(2)
 
     @classmethod
     def with_random_key(
@@ -48,13 +69,14 @@ class Input(_Input):
         endpoints: List[Endpoint] = None,
         enabled: bool = True,
         src: InputSource or None = None,
+        endpoint_label: Optional[str] = None,
     ) -> "Input":
         return cast(
             Input,
             super().with_random_key(
                 key_prefix=key_prefix,
                 key_random_chars=key_random_chars,
-                endpoints=endpoints or [rtmp_endpoint_factory()],
+                endpoints=endpoints or [rtmp_endpoint_factory(endpoint_label)],
                 enabled=enabled,
                 src=src or InputSource(),
             ),
@@ -64,14 +86,14 @@ class Input(_Input):
     def with_random_keys(
         cls,
         key_prefix: str = KEY_DEFAULT,
-        input_key_prefixes: [str, str] or None = InputSource.FI_KEYS_DEFAULT,
+        key_prefixes_with_labels: List[List[str]] = InputSource.FI_KEYS_DEFAULT,
         key_random_chars: int = FailoverInput.KEY_RANDOM_LENGTH_DEFAULT,
     ) -> "Input":
-        if input_key_prefixes is None:
+        if key_prefixes_with_labels is None:
             src = None
         else:
             src = InputSource.with_random_keys(
-                key_prefixes=input_key_prefixes,
+                key_prefixes_with_labels=key_prefixes_with_labels,
                 key_random_chars=key_random_chars,
             )
         return cast(
